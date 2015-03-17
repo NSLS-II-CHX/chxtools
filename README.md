@@ -1,0 +1,5 @@
+chxtools
+========
+
+Repository for data collection and analysis scripts that are useful at the
+CHX beamline at NSLS-II (11-id).
