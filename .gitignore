@@ -80,8 +80,6 @@ docs/_build/
 *.am
 *.tiff
 *.tif
-*.dat
-*.DAT
 
 #generated documntation files
 doc/resource/api/generated/

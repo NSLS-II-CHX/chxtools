@@ -12,5 +12,6 @@ setup(
     version='0.0.0',
     author='Brookhaven National Laboratory',
     packages=['chxtools'],
+    package_data={'chxtools/X-ray_database' : ['.dat']},
     include_package_data=True,
 )
