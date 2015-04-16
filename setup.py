@@ -12,9 +12,5 @@ setup(
     version='0.0.0',
     author='Brookhaven National Laboratory',
     packages=['chxtools'],
-    entry_points={
-        'console_scripts': [
-            'replay = dataportal.replay.replay:main']},
-    package_data={'chxtools': 'data/*'},
     include_package_data=True,
 )
