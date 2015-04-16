@@ -1,0 +1,18 @@
+% rocking curve width [FWHM] for Si220
+% Energy(eV), calculated with XOP Xcrystal 1.2
+% temperature factor 1, no miscut of mosaicity
+6000	40.2
+7000	33.0
+8000	28.0
+9000	24.5
+10000	21.8
+11000	19.5
+12000	17.7
+13000	16.2
+14000	15.0
+16000	13.0
+18000	11.4
+20000	10.5
+22000	9.4
+24000	8.6
+27000	7.6

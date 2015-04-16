@@ -1,0 +1,17 @@
+% rocking curve width [FWHM] for Si111
+% Energy(eV), calculated with XOP Xcrystal 1.2
+% temperature factor 1, no miscut of mosaicity
+6000	50.1
+7000	42.9
+8000	37.1
+9000	32.7
+10000	29.3
+11000	26.4
+12000	24.0
+14000	20.4
+16000	17.8
+18000	15.8
+20000	14.2
+22000	12.9
+24000	11.8
+27000	10.5
