@@ -523,10 +523,10 @@ class xpcs( object):
 ############################################
 #to get the waterfall plot
        
-xp=xpcs();
-xp.calqlist( shape='column');
-xp.fram_pixel_waterfall(1,1400)
-show_img(pint_dict[0][:,:],aspect=3)
+# xp=xpcs();
+# xp.calqlist( shape='column');
+# xp.fram_pixel_waterfall(1,1400)
+# show_img(pint_dict[0][:,:],aspect=3)
 
 #to show a image with mask
 #show_img_with_mask(FILENAME +'0001',pixellist, qind,img_format='TIFF',show_mask=T,logs=F)
