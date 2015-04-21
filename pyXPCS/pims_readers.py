@@ -2,6 +2,7 @@ from pims import FramesSequence
 from ..broker import DataBroker
 from filestore.api import retrieve
 from skimage import img_as_float
+import fabio
 
 
 class Images(FramesSequence):
@@ -95,20 +96,22 @@ class SubtractedImages(FramesSequence):
         return img_as_float(self.light[i]) - img_as_float(self.dark[i])
 
 class XrayImageSequence(ImageSequence):
-    def __init__(self, filepath, flat_field, dead_pixels,
+    def __init__(self, filepath, flat_field=None, dead_pixels=None,
                  process_func=None, dtype=None, as_grey=False):
         super(XrayImageSequence, self).__init__(
                 filepath, process_func=process_func, as_grey=as_grey)
 
     def get_frame(self, i):
         frame = super(XrayImageSequence, self).get_frame(i)
-        result = img_as_float(frame) - img_as_float(flat_field)
-        # TODO implement dead_pixels and possible beam_stop
+        result = img_as_float(frame)
+        if flat_field is not None:
+            result -= img_as_float(flat_field)
+        # TODO implement dead_pixels and possibly beam_stop
         return result
 
 
-class XraySubtractedImageSeuqnce(FramesSequence):
-    def __init__(self, light_filepath, dark_filepath, flat_field, dead_pixels,
+class XraySubtractedImageSequence(FramesSequence):
+    def __init__(self, light_filepath, dark_filepath, flat_field=None, dead_pixels=None,
                  process_func=None, dtype=None, as_grey=False):
         self.light = XrayImageSequence(light_filepath, flat_field, dead_pixels,
                                        process_func, dtype, as_grey)
@@ -119,3 +122,13 @@ class XraySubtractedImageSeuqnce(FramesSequence):
         # Convert to float to avoid out-of-bounds wrap-around errors,
         # as in 10-11 = 255.
         return img_as_float(self.light[i]) - img_as_float(self.dark[i])
+
+class EDFSequence(XrayImageSequence):
+
+    def imread(self, filename, **kwargs):
+        return fabio.edfimage(filename).data
+
+class SubtractedEDFSequence(SubtractedXrayImageSequence):
+
+    def imread(self, filename, **kwargs):
+        return fabio.edfimage(filename).data
