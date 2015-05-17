@@ -11,7 +11,7 @@ setup(
     name='chxtools',
     version='0.0.0',
     author='Brookhaven National Laboratory',
-    packages=['chxtools'],
+    packages=['chxtools', 'pyXPCS', 'pims_readers'],
     package_data={'chxtools/X-ray_database' : ['.dat']},
     include_package_data=True,
 )
