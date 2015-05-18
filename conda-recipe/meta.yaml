@@ -26,7 +26,6 @@ requirements:
     - h5py
     - hdf5-lz4
     - prettytable
-    - conda-env > #####
     - fabio
 
 test:
