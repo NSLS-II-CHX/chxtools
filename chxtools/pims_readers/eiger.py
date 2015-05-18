@@ -34,7 +34,7 @@ class EigerImages(FramesSequence):
             lengths = [f['entry'][key].shape[0] for key in self.keys]
         for k in self.keys:
             filename = prefix + k
-            filepath = os.path.join(os.path.dirname(master_filename), filename)
+            filepath = os.path.join(os.path.dirname(master_filepath), filename)
             if not os.path.isfile(filepath):
                 raise IOError("Cannot locate expected data file: {0}".format(
                         filepath))
