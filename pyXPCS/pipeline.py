@@ -19,7 +19,8 @@ class MTAutocorr(object):
 
     def __init__(self, detector_distance, pixel_size, wavelength,
                  direct_beam_location, **kwargs):
-    # ^ some of this is for creating the mask/labels
+        # ^ some of this is for creating the mask/labels
+        pass
 
     def __call__(images, dict_of_indices, num_buffers, num_levels):
         shape = images.image_shape
