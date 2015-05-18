@@ -42,7 +42,8 @@ class EigerImages(FramesSequence):
         # Table of Contents return a tuple:
         # self._toc[5] -> [which file, which element in that file]
         self._toc = np.concatenate(
-                [zip(i*np.ones(length), np.arange(length))
+                [zip(i*np.ones(length, dtype=int),
+                     np.arange(length, dtype=int))
                 for i, length in enumerate(lengths)])
 
     def get_frame(self, i):
