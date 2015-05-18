@@ -23,6 +23,7 @@ requirements:
   run:
     - python
     - numpy
+    - pims >0.2.2
     - h5py
     - hdf5-lz4
     - prettytable
