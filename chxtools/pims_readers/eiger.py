@@ -9,6 +9,7 @@ conda channels and externally from:
 conda install -c danielballan hdf5-lz4
 """
 import re
+import io
 import h5py
 from pims import FramesSequence, Frame
 
