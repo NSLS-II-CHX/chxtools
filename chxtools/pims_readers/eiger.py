@@ -31,7 +31,7 @@ class EigerImages(FramesSequence):
         prefix = m.group(1)
         with h5py.File(master_filepath) as f:
             self.keys = f['entry'].keys()
-            lengths = [f['entry'][key].shape[0] for key in keys]
+            lengths = [f['entry'][key].shape[0] for key in self.keys]
         for k in self.keys:
             filename = prefix + k
             filepath = os.path.join(os.dirname(master_filename), filename)
