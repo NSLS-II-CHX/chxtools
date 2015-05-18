@@ -16,17 +16,19 @@ from pims import FramesSequence, Frame
 
 class EigerImages(FramesSequence):
 
+    pattern = re.compile('(.*)master.*')
+
     def __init__(self, master_filepath):
         # The 'master' file points to data in other files.
         # Construct a list of those filepaths and check that they exist.
         self.master_filepath = master_filepath
-        m = re.match(os.path.basename(master_filepath), '(.*)master.*')
+        m = self.pattern.match(os.path.basename(master_filepath))
         if m is None:
             raise ValueError("This reader expects filenames containing "
                              "the word 'master'. If the file was renamed, "
                              "revert to the original name given by the "
                              "detector.")
-        prefix = m.get(1)
+        prefix = m.group(1)
         with h5py.File(master_filepath) as f:
             self.keys = f['entry'].keys()
             lengths = [f['entry'][key].shape[0] for key in keys]
