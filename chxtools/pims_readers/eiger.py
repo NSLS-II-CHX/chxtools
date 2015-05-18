@@ -50,8 +50,8 @@ class EigerImages(FramesSequence):
         key_number, elem_number = self._toc[i]
         key = self.keys[key_number]
         with h5py.File(self.master_filepath) as f:
-            img = f[key][elem_number]
-            return Frame(img, frame_no=i)
+            img = f['entry'][key][elem_number]
+        return Frame(img, frame_no=i)
 
     def __len__(self):
         return len(self._toc)
