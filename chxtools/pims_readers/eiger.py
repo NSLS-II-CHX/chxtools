@@ -30,7 +30,7 @@ class EigerImages(FramesSequence):
                              "detector.")
         prefix = m.group(1)
         with h5py.File(master_filepath) as f:
-            self.keys = f['entry'].keys()
+            self.keys = [k for k in f['entry'].keys() if k.startswith('data')]
             lengths = [f['entry'][key].shape[0] for key in self.keys]
         for k in self.keys:
             filename = prefix + k
