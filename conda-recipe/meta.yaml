@@ -1,0 +1,38 @@
+package:
+  name: chxtools
+  version: {{ environ['GIT_DESCRIBE_TAG'] }}.post{{ environ['GIT_DESCRIBE_NUMBER'] }}
+
+source:
+  git_url: ../
+
+build:
+  number: 0
+
+  # Note that this will override the default build string with the Python
+  # and NumPy versions
+  string: {{ environ.get('GIT_BUILD_STR', '') }}_np{{ np }}py{{ py }}
+
+  entry_points:
+    - replay = replay.replay:main
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+    - numpy
+    - h5py
+    - hdf5-lz4
+    - prettytable
+    - fabio
+
+test:
+  imports:
+    - 'chxtools'
+    - 'chxtools.pims_readers'
+
+about:
+  home: https://github.com/NSLS-II/dataportal
+  license: BSD
