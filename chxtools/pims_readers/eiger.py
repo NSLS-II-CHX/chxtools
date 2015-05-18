@@ -10,6 +10,7 @@ conda install -c danielballan hdf5-lz4
 """
 import re
 import os
+import numpy as np
 import h5py
 from pims import FramesSequence, Frame
 
