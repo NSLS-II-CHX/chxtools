@@ -1,0 +1,44 @@
+from enaml.widgets.api import *
+from enaml.layout.api import *
+
+enamldef MainView(MainWindow): main_view:
+    attr model
+    Container:
+        DockArea:
+            layout = HSplitLayout('pvs', 'plot')
+            DockItem: pvs:
+                name = 'pvs'
+                title = "PVs"
+                Form:
+                    Label:
+                        text = "start time"
+                    Field:
+                        text := model.t0
+                    Label:
+                        text = "finish time"
+                    Field:
+                        text := model.t1
+                    Label:
+                        text = "PV1"
+                    Field:
+                        text := model.pv1
+                    Label:
+                        text = "PV2"
+                    Field:
+                        text := model.pv2
+                    Label:
+                        text = "PV3"
+                    Field:
+                        text := model.pv3
+                    Label:
+                        text = "PV4"
+                    Field:
+                        text := model.pv4
+            DockItem: plot:
+                name = 'plot'
+                title = "Plot"
+                Container:
+                    MPLCanvas:
+                        figure << model._fig
+                        toolbar_visible = True
+
