@@ -59,7 +59,7 @@ def print_estimate_table_det_rows(estimate_dict):
     estimate_keys = set()
     for pos, det_dict in estimate_dict.items():
         for det, est in det_dict.items():
-            print('est: {}'.format(est))
+    #        print('est: {}'.format(est))
             for k, v in est.items():
                 estimate_keys.add(k)
     estimate_keys = list(estimate_keys)

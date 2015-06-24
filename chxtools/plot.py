@@ -51,7 +51,7 @@ def plot1d(y, x=None, scans=None, live=True, sleep_time=1):
     if scans is None:
         scans = []
     lines1 = {}
-    fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(10,10), sharex=True)
+    fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(15,10), sharex=True)
     fig.show()
     for scan_id in scans:
         hdr = DataBroker[scan_id]
