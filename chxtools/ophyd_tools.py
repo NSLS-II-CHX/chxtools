@@ -9,7 +9,11 @@ class ComputeScan(Scan):
 
     def post_scan(self):
         super(ComputeScan, self).post_scan()
-        x = getattr(self.data[-1], self.positioners[0].name)
+        try:
+            x = getattr(self.data[-1], self.positioners[0].name)
+        except IndexError as ie:
+            return
+            pass
         positioners = [pos.name for pos in self.positioners]
         detectors = sorted([det for det in self.data[-1].data_dict.keys()
                             if not det in positioners])
