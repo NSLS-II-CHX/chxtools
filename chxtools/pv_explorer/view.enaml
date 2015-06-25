@@ -43,6 +43,15 @@ enamldef MainView(MainWindow): main_view:
                     DatetimeSelector:
                         datetime := model.dt0
                         calendar_popup = True
+                    PushButton: pb:
+                        text = 'Browse'
+                        clicked ::
+                            path = FileDialogEx.get_open_file_name(
+                                accept_mode = 'open', file_mode='existing_file')
+                            if path:
+                                model.data_file = path
+                    Label: filename:
+                        text << model.data_file
             DockItem: plot:
                 name = 'plot'
                 title = "Plot"
