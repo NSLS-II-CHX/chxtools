@@ -1,5 +1,7 @@
 from enaml.widgets.api import *
 from enaml.layout.api import *
+from enaml.stdlib.fields import FloatField
+
 
 enamldef MainView(MainWindow): main_view:
     attr model
@@ -12,12 +14,14 @@ enamldef MainView(MainWindow): main_view:
                 Form:
                     Label:
                         text = "start time"
-                    Field:
-                        text := model.t0
+                    FloatField:
+                        value := model.t0
                     Label:
                         text = "finish time"
-                    Field:
-                        text := model.t1
+                    FloatField:
+                        value := model.t1
+                    #Looper: pvs:
+                    #    Label
                     Label:
                         text = "PV1"
                     Field:
@@ -34,6 +38,11 @@ enamldef MainView(MainWindow): main_view:
                         text = "PV4"
                     Field:
                         text := model.pv4
+                    Label:
+                        text = 'time:'
+                    DatetimeSelector:
+                        datetime := model.dt0
+                        calendar_popup = True
             DockItem: plot:
                 name = 'plot'
                 title = "Plot"

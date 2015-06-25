@@ -2,10 +2,9 @@ from atom.api import *
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 import numpy as np
+import datetime
 
-def _get_from_channel_archiver(pv_name, t0, t1):
-    t0 = 0
-    t1 = 10
+def _get_from_channel_archiver(pv_name, t0=0, t1=10):
     x = np.linspace(t0, t1, 1000)
     y = np.sin(x) * 10
     y += np.random.randn(len(x))
@@ -22,17 +21,24 @@ class Model(Atom):
     autolim_axes = Bool(True)
     _axes = Dict()
 
-    t0 = Str()
-    t1 = Str()
+    t0 = Float()
+    t1 = Float()
+
+    dt0 = Typed(datetime.datetime)
 
     def __init__(self):
         with self.suppress_notifications():
             # plotting initialization
+            self.dt0 = datetime.datetime.utcnow()
             self._fig = Figure(figsize=(1, 1))
             self._fig.set_tight_layout(True)
             for name, position in zip(['pv1', 'pv2', 'pv3', 'pv4'],
-                                      range(1,5)):
+                                      range(1, 5)):
                 self._axes[name] = self._fig.add_subplot(4, 1, position)
+
+    @observe('dt0')
+    def dt0_changed(self, changed):
+        print(changed)
 
     @observe('pv1', 'pv2', 'pv3', 'pv4')
     def get_pv1(self, changed):
