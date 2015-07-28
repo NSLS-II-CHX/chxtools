@@ -16,26 +16,35 @@ from pims import FramesSequence, Frame
 
 
 class EigerImages(FramesSequence):
-
-    pattern = re.compile('(.*)master.*')
-
+    pattern = re.compile('(.*)master.*')    
     def __init__(self, master_filepath):
         # The 'master' file points to data in other files.
         # Construct a list of those filepaths and check that they exist.
         self.master_filepath = master_filepath
+
+        
+        ndatafiles = 0
         m = self.pattern.match(os.path.basename(master_filepath))
+        
         if m is None:
             raise ValueError("This reader expects filenames containing "
                              "the word 'master'. If the file was renamed, "
                              "revert to the original name given by the "
                              "detector.")
         prefix = m.group(1)
+        pattern_data =  prefix + 'data'
+        head, base = os.path.split( master_filepath )        
+        for files in os.listdir(head):
+            if pattern_data in  files:
+                ndatafiles +=1
+        
         with h5py.File(master_filepath) as f:
             try:
                 entry = f['entry']['data']  # Eiger firmware v1.3.0 and onwards
             except KeyError:
                 entry = f['entry']          # Older firmwares
-            self.keys = [k for k in entry.keys() if k.startswith('data')]
+            self.keys = sorted([k for k in entry.keys() if k.startswith('data')])[:ndatafiles]
+
             lengths = [entry[key].shape[0] for key in self.keys]
         for k in self.keys:
             filename = prefix + k + '.h5'
