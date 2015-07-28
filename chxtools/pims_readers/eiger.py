@@ -31,8 +31,12 @@ class EigerImages(FramesSequence):
                              "detector.")
         prefix = m.group(1)
         with h5py.File(master_filepath) as f:
-            self.keys = [k for k in f['entry'].keys() if k.startswith('data')]
-            lengths = [f['entry'][key].shape[0] for key in self.keys]
+            try:
+                entry = f['entry']['data']  # Eiger firmware v1.3.0 and onwards
+            except KeyError:
+                entry = f['entry']          # Older firmwares
+            self.keys = [k for k in entry.keys() if k.startswith('data')]
+            lengths = [entry[key].shape[0] for key in self.keys]
         for k in self.keys:
             filename = prefix + k + '.h5'
             filepath = os.path.join(os.path.dirname(master_filepath), filename)
@@ -50,7 +54,10 @@ class EigerImages(FramesSequence):
         key_number, elem_number = self._toc[i]
         key = self.keys[key_number]
         with h5py.File(self.master_filepath) as f:
-            img = f['entry'][key][elem_number]
+            try:
+                img = f['entry']['data'][key][elem_number]  # Eiger firmware v1.3.0 and onwards
+            except KeyError:
+                img = f['entry'][key][elem_number]          # Older firmwares
         return Frame(img, frame_no=i)
 
     def __len__(self):
