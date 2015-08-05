@@ -11,7 +11,7 @@ class ComputeScan(Scan):
         super(ComputeScan, self).post_scan()
         try:
             x = getattr(self.data[-1], self.positioners[0].name)
-        except IndexError as ie:
+        except (IndexError,AttributeError) as ie:
             return
             pass
         positioners = [pos.name for pos in self.positioners]
