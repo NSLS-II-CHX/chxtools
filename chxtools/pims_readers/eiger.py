@@ -1,6 +1,4 @@
 """
-#ref - taken from Yugang chxtools
-https://github.com/yugangzhang/chxtools/blob/master/chxtools/pims_readers/eiger.py
 This reader opens images taken using an Eiger detector at NSLS-II.
 It expects a "master file" and a "data file" in the same directory.
 
