@@ -1,4 +1,6 @@
 """
+#ref - taken from Yugang chxtools
+https://github.com/yugangzhang/chxtools/blob/master/chxtools/pims_readers/eiger.py
 This reader opens images taken using an Eiger detector at NSLS-II.
 It expects a "master file" and a "data file" in the same directory.
 
@@ -13,7 +15,6 @@ import os
 import numpy as np
 import h5py
 from pims import FramesSequence, Frame
-
 
 class EigerImages(FramesSequence):
     pattern = re.compile('(.*)master.*')    
@@ -59,6 +60,40 @@ class EigerImages(FramesSequence):
                      np.arange(length, dtype=int)))
                 for i, length in enumerate(lengths)])
 
+        #Read in some of the detector experimental parameters
+        f = h5py.File(master_filepath)
+        dbeam = f['entry']['instrument']['beam']
+        ddet = f['entry']['instrument']['detector']
+        ddetS = f['entry']['instrument']['detector']['detectorSpecific']
+
+        self.wavelength = np.array(dbeam['incident_wavelength'])
+
+        self.pxdimx = np.array(ddet['x_pixel_size'])
+        self.pxdimy = np.array(ddet['y_pixel_size'])
+        self.threshold_energy = np.array(ddet['threshold_energy'])
+        self.det_distance = np.array(ddet['detector_distance'])
+        self.beamx0 = np.array(ddet['beam_center_x'])
+        self.beamy0 = np.array(ddet['beam_center_y'])
+        self.sensor_thickness = np.array(ddet['sensor_thickness'])
+
+        self.photon_energy = np.array(ddetS['photon_energy'])
+        self.exposuretime = np.array(ddetS['frame_count_time'])
+        self.timeperframe = np.array(ddetS['frame_period'])
+        self.nframes = np.array(ddetS['nimages'])
+        self.version = np.array(ddetS['software_version'])
+        self.date = np.array(ddetS['data_collection_date'])
+        dimx = np.array(ddetS['x_pixels_in_detector'])
+        dimy = np.array(ddetS['y_pixels_in_detector'])
+        self.dims = (dimy,dimx)#dims from reader are flipped so I keep this notation (matrix indexing versus image indexing)
+
+        f.close()
+
+        #Quick check for version change, if not a tested version, warn user.
+        if(self.version != b'1.3.0'):
+            print("Warning, this has only been tested on EIGER version(s) 1.3.0\n\
+                    Your current version is {}. Please ask beamline staff to verify the \n\
+                    version difference will not affect your reading.".format(self.version))
+
     def get_frame(self, i):
         key_number, elem_number = self._toc[i]
         key = self.keys[key_number]
@@ -68,6 +103,14 @@ class EigerImages(FramesSequence):
             except KeyError:
                 img = f['entry'][key][elem_number]          # Older firmwares
         return Frame(img, frame_no=i)
+
+    def get_flatfield(self):
+        '''EIGER specific routine to obtain the flatfield correction.'''
+        f = h5py.File(self.master_filepath)
+        ddetS = f['entry']['instrument']['detector']['detectorSpecific']
+        flatfield = np.array(ddetS['flatfield'])
+        f.close()
+        return flatfield
 
     def __len__(self):
         return len(self._toc)
