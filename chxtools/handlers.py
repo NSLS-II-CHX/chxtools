@@ -1,5 +1,5 @@
 from filestore.retrieve import HandlerBase
-from .pims_readers import EigerImages
+from chxtools.pims_readers.eiger import EigerImages
 
 EIGER_MD_DICT = {
     'y_pixel_size': 'entry/instrument/detector/y_pixel_size',
