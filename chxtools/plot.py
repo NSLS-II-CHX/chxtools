@@ -22,13 +22,13 @@ def new_queue(header, queue=None):
 
 vlines = {'center_of_mass': {'color': 'red'},
           'cen': {'color': 'red', 'ls': '--'},}
-hlines = {'avgy': {'color': 'blue',  'ls': '-'}, 
-          'ymin': {'color': 'black', 'ls': '--'}, 
+hlines = {'avgy': {'color': 'blue',  'ls': '-'},
+          'ymin': {'color': 'black', 'ls': '--'},
           'ymax': {'color': 'black', 'ls': '--'}, }
 points = {'cen': {'color': 'red', 'marker': 'o'},
-          'fwmh_left': {'color': 'red', 'marker': '<'}, 
+          'fwmh_left': {'color': 'red', 'marker': '<'},
           'fwhm_right': {'color': 'red', 'marker': '>'}}
-          
+
 def plot1d(y, x=None, scans=None, live=True, sleep_time=1):
     """Plot live data and on-the-fly peak stats estimator
 
@@ -37,8 +37,8 @@ def plot1d(y, x=None, scans=None, live=True, sleep_time=1):
     y : str
         The name of the y value to plot
     x : str, optional
-        The name of the value to plot on the x axis. If None, defaults 
-        to the sequence number of the event (Note that this probably works, 
+        The name of the value to plot on the x axis. If None, defaults
+        to the sequence number of the event (Note that this probably works,
         but I'm not sure as it has not been tested!)
     scans : list, optional
         List of other scan indices to plot. uses db[] syntax, so any valid
@@ -108,7 +108,7 @@ def plot1d(y, x=None, scans=None, live=True, sleep_time=1):
             lines1[scan_id].set_data(new_x, new_y)
             ax1.relim(visible_only=True)
             ax1.legend(loc=0).draggable()
-            
+
             # now deal with axis 2
             try:
                 stats = estimate(np.asarray(new_x), np.asarray(new_y))
@@ -122,7 +122,7 @@ def plot1d(y, x=None, scans=None, live=True, sleep_time=1):
                 for stat, vals in stats.items():
                     if stat in points:
                         # sometimes 'cen' comes back as one or two values. This
-                        # try/except block is a way to do the right thing when 
+                        # try/except block is a way to do the right thing when
                         # this happens
                         try:
                             vals[0]
@@ -141,4 +141,3 @@ def plot1d(y, x=None, scans=None, live=True, sleep_time=1):
             fig.canvas.draw()
             fig.canvas.flush_events()
             ttime.sleep(sleep_time)
-
