@@ -50,7 +50,7 @@ def get_Lambda(E,u='SI'):
     elif u is 'm' or u is 'SI':
             scale=1; return l*scale
     else:
-            print 'invalid option, type "get_Lambda(\'?\')" for available options and syntax'
+            print ('invalid option, type "get_Lambda(\'?\')" for available options and syntax')
   
    
 def get_saxsQ(theta,E=8):
@@ -90,11 +90,11 @@ def get_ac(material,E=8):
         if np.min(E)>=np.min(n[:,0]/1000) and np.max(E)<=np.max(n[:,0]/1000):
             d=np.interp(E*1000,n[:,0],n[:,1])
             return np.degrees(np.sqrt(2*d))
-        else: print 'error: energy '+"%3.4f" %E +'[keV] out of range ('+"%3.4f" % np.min(n[:,0]/1000)+'=<E<='+"%3.4f" % np.max(n[:,0]/1000)+'keV)'
+        else: print ('error: energy '+"%3.4f" %E +'[keV] out of range ('+"%3.4f" % np.min(n[:,0]/1000)+'=<E<='+"%3.4f" % np.max(n[:,0]/1000)+'keV)')
     elif material=='material?':
-        print 'list of supported materials (based on data files in directory '+datapath+':'
-        print name       
-    else: print 'error: non recognized material, please create index of refraction file first. Type "get_ac?" for instructions; type get_ac("material?") for list of supported materials' 
+        print ('list of supported materials (based on data files in directory '+datapath+':')
+        print (name   )    
+    else: print ('error: non recognized material, please create index of refraction file first. Type "get_ac?" for instructions; type get_ac("material?") for list of supported materials') 
         
 def get_n(material,E=8):
     """
@@ -119,11 +119,11 @@ def get_n(material,E=8):
             d=np.interp(E*1000,n[:,0],n[:,1])
             b=np.interp(E*1000,n[:,0],n[:,2])
             return d-1j*b
-        else: print 'error: energy '+"%3.4f" %E +'[keV] out of range ('+"%3.4f" % np.min(n[:,0]/1000)+'=<E<='+"%3.4f" % np.max(n[:,0]/1000)+'keV)'
+        else: print ('error: energy '+"%3.4f" %E +'[keV] out of range ('+"%3.4f" % np.min(n[:,0]/1000)+'=<E<='+"%3.4f" % np.max(n[:,0]/1000)+'keV)')
     elif material=='material?':
-        print 'list of supported materials (based on data files in directory '+datapath+':'
-        print name
-    else: print 'error: non recognized material, please create index of refraction file first. Type "get_n?" for instructions; type get_n("material?") for list of supported materials'
+        print ('list of supported materials (based on data files in directory '+datapath+':')
+        print (name)
+    else: print ('error: non recognized material, please create index of refraction file first. Type "get_n?" for instructions; type get_n("material?") for list of supported materials')
 
 def get_mu(material,E=8):
     """
@@ -148,11 +148,11 @@ def get_mu(material,E=8):
         if np.min(E)>=np.min(m[:,0]/1000) and np.max(E)<=np.max(m[:,0]/1000):
             mu=np.interp(E*1000,m[:,0],m[:,1])
             return mu
-        else: print 'error: energy '+"%3.4f" %E +'[keV] out of range ('+"%3.4f" % np.min(m[:,0]/1000)+'=<E<='+"%3.4f" % np.max(m[:,0]/1000)+'keV)'
+        else: print ('error: energy '+"%3.4f" %E +'[keV] out of range ('+"%3.4f" % np.min(m[:,0]/1000))+'=<E<='+"%3.4f" % np.max(m[:,0]/1000)+'keV)'
     elif material=='material?':
-        print 'list of supported materials (based on data files in directory '+datapath+':'
-        print name
-    else: print 'error: non recognized material, please create index of refraction file first. Type get_mu("?") for instructions; type get_n("material?") for list of supported materials'
+        print ('list of supported materials (based on data files in directory '+datapath+':')
+        print (name)
+    else: print ('error: non recognized material, please create index of refraction file first. Type get_mu("?") for instructions; type get_n("material?") for list of supported materials')
     
 def get_T(material,E=8,l=1):
     """
@@ -184,12 +184,12 @@ def get_T(material,E=8,l=1):
                 b=np.interp(E*1000,n[:,0],n[:,2])
                 mu=4*np.pi/get_Lambda(E,'um')*b;
                 return np.exp(-mu*l);
-            else: print 'error: energy '+"%3.4f" %E +'[keV] out of range ('+"%3.4f" % np.min(n[:,0]/1000)+'=<E<='+"%3.4f" % np.max(n[:,0]/1000)+'keV)'
+            else: print ('error: energy '+"%3.4f" %E +'[keV] out of range ('+"%3.4f" % np.min(n[:,0]/1000)+'=<E<='+"%3.4f" % np.max(n[:,0]/1000)+'keV)')
         elif material=='material?':
-            print 'list of supported materials (based on data files in directory '+datapath+':'
-            print name
-        else: print 'error: non recognized material, please create index of refraction file first. Type "get_T?" for instructions; type get_T("material?") for list of supported materials'
-    else: print 'error: either energy or length must be a scalar, cannot scan both energy and length at the same time.'
+            print ('list of supported materials (based on data files in directory '+datapath+':')
+            print (name)
+        else: print ('error: non recognized material, please create index of refraction file first. Type "get_T?" for instructions; type get_T("material?") for list of supported materials')
+    else: print ('error: either energy or length must be a scalar, cannot scan both energy and length at the same time.')
 
 def get_Bragg(reflection,E=8.):
     """
@@ -208,7 +208,7 @@ def get_Bragg(reflection,E=8.):
         lam=get_Lambda(E,'A')
         if reflection in reflstr:
             ind=reflstr.index(reflection)
-            print reflstr[ind] +': d_{hkl}=' + "%3.4f" %dspace[ind] +'A   I/I_o='+ "%3.4f" %Irel[ind]
+            print (reflstr[ind] +': d_{hkl}=' + "%3.4f" %dspace[ind] +'A   I/I_o='+ "%3.4f" %Irel[ind])
             theta=np.degrees(np.arcsin(lam/2/dspace[ind]))
             ds=[];I=[]
             for l in range(0,np.size(theta)):
@@ -217,10 +217,10 @@ def get_Bragg(reflection,E=8.):
             res=np.array([theta,np.array(ds),np.array(I)])
             return res.T
         elif reflection=='reflections?':
-            print 'List of available reflections (T=25C):'
-            print reflstr   
-        else: print 'error: reflection not found. Type get_Bragg("reflections?") for list of available reflections.'
-    else: print 'error: reflection has to be a string and E needs to be numeric. Type get_Bragg? for help'
+            print ('List of available reflections (T=25C):')
+            print (reflstr )  
+        else: print ('error: reflection not found. Type get_Bragg("reflections?") for list of available reflections.')
+    else: print ('error: reflection has to be a string and E needs to be numeric. Type get_Bragg? for help')
 
 def get_EBragg(reflection,theta_Bragg=12.0):
      """
@@ -253,11 +253,11 @@ def get_EBragg(reflection,theta_Bragg=12.0):
              EthetaB=hPlank*cvac/(lam*Qelectron)*1e7;
              return EthetaB.T
          elif reflection=='reflections?':
-             print 'List of available reflections (T=25C):'
-             print reflstr   
-         else: print 'error: reflection not found. Type get_EBragg("reflections?") for list of available reflections.'
+             print ('List of available reflections (T=25C):')
+             print (reflstr   )
+         else: print ('error: reflection not found. Type get_EBragg("reflections?") for list of available reflections.')
      
-     else: print 'error: reflection has to be a string and E needs to be numeric. Type get_Bragg? for help'
+     else: print ('error: reflection has to be a string and E needs to be numeric. Type get_Bragg? for help')
 
     
 def get_Qpixel(center=[0,0],cord=[100,100],dis=1000,ps=75,E=8):
@@ -294,7 +294,7 @@ def get_2theta(Qxy, E=8):
 def get_Gam(Qz,alpha_i=.12,E=8):
     hlpstr="by sof 01/12/2003   Returns the angle Gamma (out-of-plane angle in GIXD) defined in terms of Qz, the incident angle and the energy of the X-Ray beam. Type getGam(Qz [1/A], Incident Angle [deg] (default: 0.12deg) , E[keV] (default:8keV)), This function is vector compatible. Type get_Gam(\'?\') for help"
     if Qz=='?':
-        print hlpstr
+        print (hlpstr)
     else:
         Qz=np.array(Qz);alpha_i=np.array(alpha_i);E=np.array(E)
         lam=get_Lambda(E,'A')
@@ -303,7 +303,7 @@ def get_Gam(Qz,alpha_i=.12,E=8):
 def get_Qll(Ty,alpha_i=.12,d=1000,E=8):
     hlpstr="LW 26-01-2005 Function returns the parallel wavevector transfer in GI-XPCS geometry [cm^-1]. Type: get_Qll(Ty[mm],alpha_i[deg] (default: 0.12deg), d [mm] (default: 1000mm),E[keV] (default:8keV))=>qll[cm^-1]; type get_Qll(\'?\') for help"
     if Ty=='?':
-        print hlpstr
+        print ( hlpstr)
     else:
         Ty=np.array(Ty);alpha_i=np.array(alpha_i);E=np.array(E)
         lam=get_Lambda(E,'A')
@@ -313,7 +313,7 @@ def get_Qll(Ty,alpha_i=.12,d=1000,E=8):
 def get_Qxy(theta,E=8):
     hlpstr="sof 26/11/2003   To return for in plane X-ray scattering the parallel wavevector transfer in 1/A. Type get_Qxy(FULL scattering angle [deg], E [keV] (default:8keV), the function returns the Q vector [1/A] in the surface plane. Angle measured in surface from specular direction! This function is vector compatible. Type get_QXY(\'?\') for help."
     if theta=='?':
-        print hlpstr
+        print (hlpstr)
     else:
         theta=np.array(theta);E=np.array(E)
         lam=get_Lambda(E,'A')
@@ -322,7 +322,7 @@ def get_Qxy(theta,E=8):
 def get_Qz(Gam,alpha_i=.12,E=8):
     hlpstr="function by sof 01/12/2003   Returns the Qz z-component of wavevector transfer defined in terms of the incident  and measured angles and the energy of the X-Ray beam.  Type get_Qz(Gam [deg], alpha_i [deg] (default: 0.12deg), E[keV] (default: 8keV)). This function is vector compatible. Type get_Qz(\'?\') for help."
     if Gam=='?':
-        print hlpstr
+        print (hlpstr)
     else:
         E=np.array(E);Gam=np.deg2rad(np.array(Gam));alpha_i=np.deg2rad(np.array(alpha_i))
         lam=get_Lambda(E,'A')
@@ -373,8 +373,8 @@ def get_gap(E,harmonic=3,ID='CHX_IVU20_12202014'):
             name.append(m.group(0))             
 
     if E=='ID?':
-        print 'list of available magnetic measurements (based on data files in directory '+datapath+':'
-        print name
+        print ('list of available magnetic measurements (based on data files in directory '+datapath+':')
+        print (name)
     else:
         E=np.array(E)*1.0
         harm_check(harmonic)     
@@ -406,8 +406,8 @@ def get_Es(gap,harmonic=[1,2,3,4,5],ID='CHX_IVU20_12202014'):
         if m is not None:
             name.append(m.group(0))             
     if gap=='ID?':
-        print 'list of available magnetic measurements (based on data files in directory '+datapath+':'
-        print name
+        print ('list of available magnetic measurements (based on data files in directory '+datapath+':')
+        print (name)
     else:
         for l in range(0, np.size(harmonic)):
             harm_check(harmonic)            
@@ -421,8 +421,8 @@ def get_Es(gap,harmonic=[1,2,3,4,5],ID='CHX_IVU20_12202014'):
                             Es=np.interp(gap,magdat[:,0],magdat[:,2])
                             Eharmonics=np.array([harmonic,harmonic*Es])
                             return Eharmonics.T  
-                        else: print 'error: gap '+"%3.4f" % gap +'[mm] out of range for gap ('+"%3.4f" % np.min(magdat[:,0])+'=<gap<='+"%3.4f" % np.max(magdat[:,0])+'mm), try higher/lower harmonic number.'
-                    else: print 'error: non recognized magnetic data. Type get_gap(\'ID?\') for a list of available mangetic datasets.'
+                        else: print ('error: gap '+"%3.4f" % gap +'[mm] out of range for gap ('+"%3.4f" % np.min(magdat[:,0])+'=<gap<='+"%3.4f" % np.max(magdat[:,0])+'mm), try higher/lower harmonic number.')
+                    else: print ('error: non recognized magnetic data. Type get_gap(\'ID?\') for a list of available mangetic datasets.')
 
 def get_pinflux(current,Energy,thickness=300):
     """
@@ -453,8 +453,8 @@ def get_pinflux(current,Energy,thickness=300):
     PhCur=1E10*crossdat[:,0]*1e3*1.6022e-16*(1-np.exp(-crossdat[:,1]*thickness*rho_Si))/epsilon
     PhCurint=np.interp(Energy,crossdat[:,0],PhCur)
     photon_flux=current/PhCurint*1E10
-    print 'photo current for E= ',Energy,'keV: ',PhCurint*1E3,'mA/10^10ph/s'
-    print 'flux for photo current ',current*1E3,'mA at E=',Energy,'keV: ',photon_flux,'ph/s'
+    print ('photo current for E= ',Energy,'keV: ',PhCurint*1E3,'mA/10^10ph/s')
+    print ('flux for photo current ',current*1E3,'mA at E=',Energy,'keV: ',photon_flux,'ph/s')
     return photon_flux
             
 ####### Help functions
