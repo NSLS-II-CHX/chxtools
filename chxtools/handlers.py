@@ -1,3 +1,4 @@
+from filestore.api import register_handler, deregister_handler
 from filestore.retrieve import HandlerBase
 from chxtools.pims_readers.eiger import EigerImages
 
