@@ -3,7 +3,12 @@
 by LW 03/20/2015
 some wrapper functions for ophyd
 """
-import Tkinter, tkFileDialog
+from __future__ import print_function
+import tkinter, tkinter.filedialog
+import time
+import os
+import stat
+from epics import caget, caput
 
 def det_select(det):
     """
@@ -16,19 +21,20 @@ def det_select(det):
     calling sequence: det_select(det)
     """
     try:
-	rm_det=ascan.user_detectors[0].name
-	ascan.user_detectors.remove(session_mgr[rm_det])
+        rm_det = ascan.user_detectors[0].name
+        ascan.user_detectors.remove(session_mgr[rm_det])
         ascan.default_triggers = []
         ascan.default_detectors = []
-	print 'removed previous default detector: ',rm_det
-    except: print 'list of detectors appeared to be empty...'
-     
+        print('removed previous default detector: ',rm_det)
+    except:
+        print('list of detectors appeared to be empty...')
+
     ascan.user_detectors.append(det)        # add detector
-    new_def_det=ascan.user_detectors[0].name    
-        
-    print ''
-    print 'new default detector: ',new_def_det
-    
+    new_def_det=ascan.user_detectors[0].name
+
+    print('')
+    print('new default detector: ',new_def_det)
+
 
 def cw_ascan(mot,xmin,xmax,npoints,acqt='default',pos_ret=True):
     """
@@ -46,27 +52,29 @@ def cw_ascan(mot,xmin,xmax,npoints,acqt='default',pos_ret=True):
     ini_motpos=caget(mot.record+'.RBV')
     # current detector:
     acq_pv=session_mgr[ascan.user_detectors[0].name].pvname
-    
+
     # set different exposure time for the scan, if requested:
     if acqt!='default':
         try:
             ini_expt=caget(acq_pv[2]) # initial exposure time
             session_mgr[ascan.user_detectors[0].name].acquire_time = acqt
-            print 'successfully set exposure time to [s]: ',acqt 
-        except: print 'could not set exposure time to ',acqt
-    
+            print('successfully set exposure time to [s]: ',acqt)
+        except:
+            print('could not set exposure time to ',acqt)
+
     # execute the scan
     ascan(mot,xmin,xmax,npoints)
-    
+
     # put beamline back into initial state
     if pos_ret==True:
         caput(mot.record+'.VAL',ini_motpos)
-        print 'returned axes to: ',ini_motpos
+        print('returned axes to: ',ini_motpos)
     if acqt!='default':
         try:
             session_mgr[ascan.user_detectors[0].name].acquire_time = ini_expt
-            print 'successfully reset exposure time to [s]: ',ini_expt 
-        except: print 'could not reset exposure time to ',ini_expt
+            print('successfully reset exposure time to [s]: ',ini_expt)
+        except:
+            print('could not reset exposure time to ',ini_expt)
 
 def cw_dscan(mot,mdx,pdx,npoints,acqt='default',pos_ret=True):
     """
@@ -79,24 +87,26 @@ def cw_dscan(mot,mdx,pdx,npoints,acqt='default',pos_ret=True):
     """
     # current detector:
     acq_pv=session_mgr[ascan.user_detectors[0].name].pvname
-    
+
     # set different exposure time for the scan, if requested:
     if acqt!='default':
         try:
             ini_expt=caget(acq_pv[2]) # initial exposure time
             session_mgr[ascan.user_detectors[0].name].acquire_time = acqt
-            print 'successfully set exposure time to [s]: ',acqt 
-        except: print 'could not set exposure time to ',acqt
-    
+            print('successfully set exposure time to [s]: ',acqt)
+        except:
+            print('could not set exposure time to ',acqt)
+
     # execute the scan
     dscan(mot,mdx,pdx,npoints)
-    #print 'finished scan'    
-    
+    #print 'finished scan'
+
     if acqt!='default':
         try:
             session_mgr[ascan.user_detectors[0].name].acquire_time = ini_expt
-            print 'successfully reset exposure time to [s]: ',ini_expt 
-        except: print 'could not reset exposure time to ',ini_expt
+            print('successfully reset exposure time to [s]: ',ini_expt)
+        except:
+            print('could not reset exposure time to ',ini_expt)
 
 def cw_CCDseries(folder,filename,detector,imnum='default',startn=1,acqt='default',acqperiod='default'):
     """
@@ -112,41 +122,41 @@ def cw_CCDseries(folder,filename,detector,imnum='default',startn=1,acqt='default
     - currently saving .tiff as default
     calling sequence: cw_CCDseries(folder,filename,detector,imnum='default',startn=1,acqt='default',acqperiod='default')
     """
-    import time
-    import Tkinter, tkFileDialog
-    import os, stat, sys
+
+    import tkinter, tkinter.filedialog
+
     # get the detector name::
     detector.pvname.split('}')[0]+'}'
     #get folder interactively:
-    
+
     if folder == 'ia':
-      root=Tkinter.Tk()
+      root=tkinter.Tk()
       root.withdraw()
-      directory=tkFileDialog.askdirectory()
+      directory=tkinter.filedialog.askdirectory()
       folder=directory
     # check whether target directory exists and create it, if it doesn't
     if not os.path.exists(folder):
       os.mkdir(folder)
-      os.chmod(folder,436) 	#make sure everybody can read an write
+      os.chmod(folder,436)      #make sure everybody can read an write
       os.chmod(folder,stat.S_IRWXO)
-      print 'successfully created new directory: ',folder
-      
-   
+      print('successfully created new directory: ',folder)
+
+
     # put folder:
     r=caput(detector.pvname.split('}')[0]+'}TIFF1:FilePath', folder)      # have some problem with syntax here...
     if r==1:
-      print 'changed saving directory to: ',folder
-    else: print 'error: could not change directory for saving data files.'
+      print('changed saving directory to: ',folder)
+    else: print('error: could not change directory for saving data files.')
     # put the filename:
     r=caput(detector.pvname.split('}')[0]+'}TIFF1:FileName', filename)      # have some problem with syntax here...
     if r==1:
-      print 'filename for saving: ',filename
-    else: print 'error: could not change file name for saving.'
+      print('filename for saving: ',filename)
+    else: print('error: could not change file name for saving.')
 
-    
+
     # put start number
     caput(detector.pvname.split('}')[0]+'}TIFF1:FileNumber',startn)
-    
+
     #gather information about current camera settings
     acq_pv=session_mgr[ascan.user_detectors[0].name].pvname
     ini_acq=caget(acq_pv.split('}')[0]+'}cam1:Acquire')   # initial state: started or stopped
@@ -154,89 +164,90 @@ def cw_CCDseries(folder,filename,detector,imnum='default',startn=1,acqt='default
     ini_expt=caget(acq_pv.split('}')[0]+'}cam1:AcquireTime') # initial exposure time
     ini_acqperiod=caget(acq_pv.split('}')[0]+'}cam1:AcquirePeriod')  # initial acquiring period
     ini_imnum=caget(acq_pv.split('}')[0]+'}cam1:NumImages')  # initial image number
-    
+
     if acqt!='default':
         try:
             caput(acq_pv.split('}')[0]+'}cam1:AcquireTime',acqt)
-            print 'successfully set exposure time to [s]: ',acqt 
-        except: print 'could not set exposure time to ',acqt
+            print('successfully set exposure time to [s]: ',acqt)
+        except: print('could not set exposure time to ',acqt)
     # stop camara:
     try:
         caput(acq_pv.split('}')[0]+'}cam1:Acquire',0)
-        print 'successfully stopped camera'
-    except: print 'could not stop camera'
+        print('successfully stopped camera')
+    except: print('could not stop camera')
     # try to set image mode to multiple
     try:
         caput(acq_pv.split('}')[0]+'}cam1:ImageMode',1)
-        print 'successfully set ImageMode to "multiple"'
-    except: print 'could not set ImageMode to "multiple"'
+        print('successfully set ImageMode to "multiple"')
+    except: print('could not set ImageMode to "multiple"')
     if acqperiod!='default':
-	try:
+        try:
             caput(acq_pv.split('}')[0]+'}cam1:AcquirePeriod',acqperiod)
-            print 'successfully set acquiering period to: ',acqperiod 
-        except: print 'could not set aquireing period to ',acqperiod
+            print('successfully set acquiering period to: ',acqperiod)
+        except: print('could not set aquireing period to ',acqperiod)
     # set number of images to be taken:
     if imnum!='default':
         try:
             caput(acq_pv.split('}')[0]+'}cam1:NumImages',imnum)
-            print 'successfully set number of images to: ',imnum 
-        except: print 'could not set number of images to ',imnum
-    print 'going to start the acquisition...'
+            print('successfully set number of images to: ',imnum)
+        except: print('could not set number of images to ',imnum)
+    print('going to start the acquisition...')
     time.sleep(1)
     # start the acquisition!!!
     caput(acq_pv.split('}')[0]+'}cam1:ArrayCounter',0)#set Images acquired (image counter) to 0
-    
-    caput(detector.pvname.split('}')[0]+'}TIFF1:AutoSave',1)	# start auto save
-    caput(acq_pv.split('}')[0]+'}cam1:Acquire',1)		# start series acquisition
-    
+
+    caput(detector.pvname.split('}')[0]+'}TIFF1:AutoSave',1)    # start auto save
+    caput(acq_pv.split('}')[0]+'}cam1:Acquire',1)               # start series acquisition
+
     counting=0
     current_file=caget(detector.pvname.split('}')[0]+'}TIFF1:FullFileName_RBV',as_string=True)
     while counting==0:
-	time.sleep(.5)
-	if caget(acq_pv.split('}')[0]+'}cam1:ArrayCounter_RBV')==imnum: counting=1
-	if caget(detector.pvname.split('}')[0]+'}TIFF1:FullFileName_RBV',as_string=True)!=current_file:
-	  current_file=caget(detector.pvname.split('}')[0]+'}TIFF1:FullFileName_RBV',as_string=True)
-	  print 'file written: ',current_file
-	time.sleep(.1)
+        time.sleep(.5)
+        if caget(acq_pv.split('}')[0]+'}cam1:ArrayCounter_RBV')==imnum: counting=1
+        if caget(detector.pvname.split('}')[0]+'}TIFF1:FullFileName_RBV',as_string=True)!=current_file:
+          current_file=caget(detector.pvname.split('}')[0]+'}TIFF1:FullFileName_RBV',as_string=True)
+          print('file written: ',current_file)
+        time.sleep(.1)
 
-    print 'going to stop the acquisition...'
+    print('going to stop the acquisition...')
     time.sleep(.5)
-    caput(acq_pv.split('}')[0]+'}cam1:Acquire',0)		# stop series acquisition (redundent...should have stopped already
-    caput(detector.pvname.split('}')[0]+'}TIFF1:AutoSave',0)	# stop auto save
-    
-    print 'going to reset camera...'
+    caput(acq_pv.split('}')[0]+'}cam1:Acquire',0)               # stop series acquisition (redundent...should have stopped already
+    caput(detector.pvname.split('}')[0]+'}TIFF1:AutoSave',0)    # stop auto save
+
+    print('going to reset camera...')
     #time.sleep(5)
      # put camera back into initial state:
     if acqt!='default':
         try:
             caput(acq_pv.split('}')[0]+'}cam1:AcquireTime',ini_expt)
-            print 'successfully reset exposure time to [s]: ',ini_expt 
-        except: print 'could not reset exposure time to ',ini_expt
+            print('successfully reset exposure time to [s]: ',ini_expt)
+        except:
+            print('could not reset exposure time to ',ini_expt)
     try:
         caput(acq_pv.split('}')[0]+'}cam1:ImageMode',ini_mode)
-        print 'successfully reset ImageMode'
-    except: print 'could not reset ImageMode'
+        print('successfully reset ImageMode')
+    except:
+        print('could not reset ImageMode')
     try:
         caput(acq_pv.split('}')[0]+'}cam1:Acquire',ini_acq)
-        print 'successfully reset camera acqusition mode'
-    except: print 'could not reset camera acquisition mode'
+        print('successfully reset camera acqusition mode')
+    except:
+        print('could not reset camera acquisition mode')
     if acqperiod!='default':
         try:
             caput(acq_pv.split('}')[0]+'}cam1:AcquirePeriod',ini_acqperiod)
-            print 'successfully reset acquisition period to [s]: ',ini_acqperiod 
-        except: print 'could not reset acquisition period  to ',ini_acqperiod
-    if imnum!='default':
+            print('successfully reset acquisition period to [s]: ',ini_acqperiod)
+        except:
+            print('could not reset acquisition period  to ',ini_acqperiod)
+    if imnum != 'default':
         try:
             caput(acq_pv.split('}')[0]+'}cam1:NumImages',ini_imnum)
-            print 'successfully reset image numbers to: ',ini_imnum 
-        except: print 'could not reset image numbers to ',ini_imnum
+            print('successfully reset image numbers to: ',ini_imnum)
+        except:
+            print('could not reset image numbers to ',ini_imnum)
     time.sleep(.5)
-    try: 
-	caput(acq_pv.split('}')[0]+'}cam1:Acquire',ini_acq)      # restart camera if it was running before taking the series
-	print 'restarted camera'
-    except: print 'could not restart camera...'
-    
-    
-    
-    
-    
+    try:
+        caput(acq_pv.split('}')[0]+'}cam1:Acquire',ini_acq)      # restart camera if it was running before taking the series
+        print('restarted camera')
+    except:
+        print('could not restart camera...')

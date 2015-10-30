@@ -37,8 +37,7 @@ class Model(Atom):
             self._fig.set_tight_layout(True)
             pvs = ['pv1', 'pv2', 'pv3', 'pv4']
 
-            for idx, (name, position) in enumerate(zip(pvs,
-                                                       range(1, len(pvs)+1))):
+            for idx, (name, position) in enumerate(zip(pvs, range(1, len(pvs)+1))):
                 if idx == 0:
                     sharex = None
                 else:
