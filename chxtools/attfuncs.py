@@ -7,7 +7,7 @@ set optimal transmission -> set_T
 by LW 12/08/2015
 """
 import numpy as np
-import chxtools.xfuncs as xf
+from . import xfuncs as xf
 
 from epics import *
 

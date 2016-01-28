@@ -21,7 +21,8 @@ from os.path import isfile, join
 import re
 
 # path to X-ray data files
-datapath='/nfs/xf11id/shared/xfuncs/X-ray_database/'
+#datapath='/nfs/xf11id/shared/xfuncs/X-ray_database/'
+datapath='/home/xf11id/Repos/chxtools/chxtools/X-ray_database/'
 
 
 def get_Lambda(E,u='SI'):
