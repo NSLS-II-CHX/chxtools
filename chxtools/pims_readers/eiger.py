@@ -16,16 +16,16 @@ from pims import FramesSequence, Frame
 
 
 class EigerImages(FramesSequence):
-    pattern = re.compile('(.*)master.*')    
+    pattern = re.compile('(.*)master.*')
     def __init__(self, master_filepath):
         # The 'master' file points to data in other files.
         # Construct a list of those filepaths and check that they exist.
         self.master_filepath = master_filepath
 
-        
+
         ndatafiles = 0
         m = self.pattern.match(os.path.basename(master_filepath))
-        
+
         if m is None:
             raise ValueError("This reader expects filenames containing "
                              "the word 'master'. If the file was renamed, "
@@ -33,11 +33,11 @@ class EigerImages(FramesSequence):
                              "detector.")
         prefix = m.group(1)
         pattern_data =  prefix + 'data'
-        head, base = os.path.split( master_filepath )        
+        head, base = os.path.split( master_filepath )
         for files in os.listdir(head):
             if pattern_data in  files:
                 ndatafiles +=1
-        
+
         with h5py.File(master_filepath) as f:
             try:
                 entry = f['entry']['data']  # Eiger firmware v1.3.0 and onwards
@@ -55,9 +55,9 @@ class EigerImages(FramesSequence):
         # Table of Contents return a tuple:
         # self._toc[5] -> [which file, which element in that file]
         self._toc = np.concatenate(
-                [zip(i*np.ones(length, dtype=int),
-                     np.arange(length, dtype=int))
-                for i, length in enumerate(lengths)])
+            [list(zip(i*np.ones(length, dtype=int),
+                      np.arange(length, dtype=int)))
+             for i, length in enumerate(lengths)])
 
     def get_frame(self, i):
         key_number, elem_number = self._toc[i]
