@@ -5,13 +5,13 @@ import sys
 import warnings
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='chxtools',
     version='0.0.0',
     author='Brookhaven National Laboratory',
-    packages=['chxtools', 'pyXPCS', 'chxtools.pims_readers'],
+    packages=find_packages(),
     package_data={'chxtools/X-ray_database' : ['.dat']},
     include_package_data=True,
 )
