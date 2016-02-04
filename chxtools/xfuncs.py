@@ -452,7 +452,7 @@ def get_pinflux(current,Energy,thickness=300):
         raise xfuncs_Exception(['X-ray energy out of range for cross section data. ',xmin,'<=Energy<=,',xmax,' [keV]'])
     # calculate photo current PER 1E10 ph/s:
     PhCur=1E10*crossdat[:,0]*1e3*1.6022e-16*(1-np.exp(-crossdat[:,1]*thickness*rho_Si))/epsilon
-    PhCurint=np.interp(Energy,crossdat[:,0],PhCur)
+    PhCurint=np.interp(Energy,crossdat[:,0]*1E3,PhCur)
     photon_flux=current/PhCurint*1E10
     print ('photo current for E= ',Energy,'keV: ',PhCurint*1E3,'mA/10^10ph/s')
     print ('flux for photo current ',current*1E3,'mA at E=',Energy,'keV: ',photon_flux,'ph/s')

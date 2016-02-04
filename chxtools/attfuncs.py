@@ -66,7 +66,7 @@ def calc_T(T,E='auto', foil_mode='Si'):
     if E is 'auto':
        #E=8000   # temporary: don't have channel access -> set E to 8000eV   
        E=caget('XF:11IDA-OP{Mono:DCM-Ax:Energy}Mtr.RBV')     ### get energy automatically with channel access
-       print ('getting energy from global PV: E=',E,'eV (currently not implemented in test version (no channel access) -> 8000eV default)')   # future: add PV name for house keeping
+       print ('getting energy from global PV: E=',E,'eV' )   
        if E> 30000 or E< 2000:
            raise attfuncs_Exception("error: Input argument E has to be 2000<E<30000 [eV]")
     else:
@@ -117,9 +117,9 @@ def calc_T(T,E='auto', foil_mode='Si'):
     Si_ind=a[len(Cu_th):len(a)]
     Cu_ind=a[0:len(Cu_th)]
     
-    print ('*'*40)
-    print (T, best_T)
-    print ('*'*40)
+    #print ('*'*40)
+    #print (T, best_T)
+    #print ('*'*40)
     
     
     caput ('XF:11IDB-BI{Attn}Val:Trans-SP',  T)  #set point
