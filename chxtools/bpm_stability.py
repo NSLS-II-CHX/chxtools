@@ -5,7 +5,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from datetime import datetime
-
+import time as ti
 
 pv_ca = 'XF:11IDB-BI{XBPM:02}FA-A'
 pv_cb = 'XF:11IDB-BI{XBPM:02}FA-B'
@@ -184,6 +184,8 @@ def bpm_read( num_sample, filename=None,rate=10 ):
         caput( pv_num_sam, num_sample)
         caput( pv_trig, 0 )
         caput( pv_trig, 1)
+        ti.sleep(num_sample/rate+3)
+		# need to wait for the acquisition to finish before pulling data from buffer!
         for n, pv in enumerate([pv_ca, pv_cb, pv_cc, pv_cd, pv_px, pv_py, pv_sumi]):
             d = caget(pv)            
             if n==0: 
