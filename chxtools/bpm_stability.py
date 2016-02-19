@@ -69,6 +69,72 @@ def plot_current(t, ca,cb,cc,cd,sumi, res_path, filename  ):
 
 
 
+def plot_posxy_fft(t,posx,posy,res_path, filename  ):
+    fig = plt.figure(figsize=(12,10))
+    plt.title(filename)
+    ax = fig.add_subplot( 221 )
+    #ax.set_title(filename )
+    y = posx        
+    ym = y.mean()
+
+    std = (y-ym).std()
+    ax.plot(   t, y - ym, '--o', label="X-<X>"   )
+    #ax.plot(t, std+ np.zeros_like(t), '--o', label="%s +/-"%round(ym,2) + str( round(std,3) ) + ' um' ) 
+    ax.plot(t, std+ np.zeros_like(t), '--o', label= 'rms-'+ str( round(std,3) ) + ' um' )     
+    ax.plot(t, -std+ np.zeros_like(t), '--o')#, label="rms-- "+ str( colms[i] ))
+
+    ax.set_xlabel("Time, (s)")
+    ax.set_ylabel("X")
+    ax.legend( loc='best', fontsize = 16)
+
+    ax = fig.add_subplot( 223 )    
+     
+    y = posy
+    ym=y.mean()
+
+    std = (y-ym).std()
+    ax.plot(t, y - ym, '--o', label="Y-<Y>")
+   # ax.plot(t,  std + np.zeros_like(t), '--o', label="%s +/-"%round(ym,2) +  str( round(std,3)) + ' um' )
+    ax.plot(t,  std + np.zeros_like(t), '--o', label="rms-" +  str( round(std,3)) + ' um' )
+    ax.plot(t, -std+ np.zeros_like(t), '--o')#, label="rms-- "+ str( colms[i] ))
+
+
+    ax.set_xlabel("Time, (s)")
+    ax.set_ylabel("Y")    
+
+
+    ax.legend( loc='best', fontsize = 16) 
+    #try filename = filename.rstrip('.txt')
+    
+    ax = fig.add_subplot( 222 )
+    #ax.set_title(filename )
+    yt = posx
+         
+    freq,fft =  get_fft( t,yt )
+
+    ax.plot(freq,fft, '--o', label="FFT-posX" )
+    ax.set_xlabel("freq, (Hz)")
+    ax.set_ylabel("fft_x")
+    ax.set_xlim( 0, 500)
+    ax.legend( loc='best', fontsize = 16)
+
+    ax = fig.add_subplot( 224 )    
+     
+    yt = posy
+    freq,fft =  get_fft( t,yt )
+    ax.plot(freq,fft, '--o', label="FFT-PosY")
+    ax.set_xlabel("freq, (Hz)")
+    ax.set_ylabel("fft_y")
+    ax.set_xlim( 0, 500)
+    ax.legend( loc='best', fontsize = 16)    
+    
+    fig.tight_layout()
+    
+    plt.savefig( res_path + filename  + '-fft-time_posX-Y-rms.png')
+    plt.show()
+    
+    
+    
 def plot_posxy_rms(t,posx,posy,res_path, filename  ):
     fig = plt.figure(figsize=(8,6))
     ax = fig.add_subplot( 211 )
@@ -208,9 +274,9 @@ def bpm_read( num_sample, filename=None,rate=10 ):
         posy = data[5]
         sumi= data[6]
         #plot_posxy(t,posx,posy, save_path, filename )
-        plot_posxy_rms(t,posx,posy,res_path, filename  )
-        plot_fft_posxy(t,posx,posy,res_path, filename  )
-        
+        #plot_posxy_rms(t,posx,posy,res_path, filename  )
+        #plot_fft_posxy(t,posx,posy,res_path, filename  )
+        plot_posxy_fft(t,posx,posy,res_path, filename  )
         plot_current(t, ca,cb,cc,cd, sumi, res_path, filename  )
     else:
         print ('The sample number is too large,this number should < 13E4!')
