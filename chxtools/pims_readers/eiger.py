@@ -110,6 +110,14 @@ class EigerImages(FramesSequence):
         f.close()
         return flatfield
 
+    def get_pixel_mask(self):
+        ''' Get the pixel mask reported by the EIGER.'''
+        f = h5py.File(self.master_filepath,"r")
+        ddetS = f['entry']['instrument']['detector']['detectorSpecific']
+        pxmsk = np.array(ddetS['pixel_mask'])
+        f.close()
+        return pxmsk
+
     def __len__(self):
         return len(self._toc)
 
