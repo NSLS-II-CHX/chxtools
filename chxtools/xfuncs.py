@@ -204,7 +204,7 @@ def get_Bragg(reflection,E=8.):
     reflstr=['Si111cryo','Si220cryo','Si111', 'Si220', 'Si113', 'Si224', 'Si331', 'Si400','Ge111', 'Ge220', 'Ge113', 'Ge224', 'Ge331', 'Ge620', 'Ge531', 'Ge400', 'Ge115', 'Ge335','Ge440', 'Ge444', 'Ge333', 'C111', 'C220']
     dspace=np.array([3.13379852,1.91905183,3.13542,1.92004,1.63742,1.10854,1.24589,1.35767,3.26627,2.00018,1.70576,1.15480,1.29789,0.89451,0.95627,1.41434,1.08876,0.86274,1.00009,0.81657,1.08876,2.05929,1.26105])
     Irel=np.array([100,67.80,40.50,23.80,16.60,10.90,100,73.80,44.10,23.10,17.00,15.90,15.70,11.50,9.80,8.50,8.20,7.30,3.30,100,39.00])        
-    if isinstance(reflection, basestring): # and all(isinstance(E, (int, long, float, complex)) for item in [E,E]): # <- bug in python: check for E is numeric works in standalone function, but not in this package => don't check
+    if isinstance(reflection, str): # and all(isinstance(E, (int, long, float, complex)) for item in [E,E]): # <- bug in python: check for E is numeric works in standalone function, but not in this package => don't check
         E=np.array(E)
         lam=get_Lambda(E,'A')
         if reflection in reflstr:
@@ -240,7 +240,7 @@ def get_EBragg(reflection,theta_Bragg=12.0):
      cvac=2.99792458e8
      Qelectron=1.602176463e-19
 
-     if isinstance(reflection, basestring): # and all(isinstance(E, (int, long, float, complex)) for item in [E,E]): # <- bug in python: check for E is numeric works in standalone function, but not in this package => don't check
+     if isinstance(reflection,str): # and all(isinstance(E, (int, long, float, complex)) for item in [E,E]): # <- bug in python: check for E is numeric works in standalone function, but not in this package => don't check
          theta_Bragg=np.array(theta_Bragg)
          if reflection in reflstr:
              ind=reflstr.index(reflection)
