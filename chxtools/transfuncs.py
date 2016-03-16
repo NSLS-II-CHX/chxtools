@@ -153,7 +153,7 @@ def get_ip(conf,rel_z_pos,E='auto'):
     if E is 'auto':
       #E=8000   # temporary: don't have channel access -> set E to 8000eV   
       E=caget('XF:11IDA-OP{Mono:DCM-Ax:Energy}Mtr.RBV')     ### get energy automatically with channel access
-      print ('getting energy from global PV: E=',E,'eV)# (currently not implemented in test version (no channel access) -> 8000eV default)'   # future: add PV name for house keeping
+      print ('getting energy from global PV: E=',E,'eV')# (currently not implemented in test version (no channel access) -> 8000eV default)'   # future: add PV name for house keeping
       if E> 30000 or E< 2000:
           raise transfuncs_Exception("error: Input argument E has to be 2000<E<30000 [eV]")
     E=np.array(E)*1.
