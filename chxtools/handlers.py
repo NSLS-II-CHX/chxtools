@@ -48,7 +48,18 @@ class LazyEigerHandler(HandlerBase):
         print('hdf5 path = %s' % master_path)
         with h5py.File(master_path, 'r') as f:
             md = {k: f[v].value for k, v in self.vals_dict.items()}
-            
+        # the pixel mask from the eiger contains:
+        # 1  -- gap
+        # 2  -- dead
+        # 4  -- under-responsive
+        # 8  -- over-responsive
+        # 16 -- noisy
+        pixel_mask = md['pixel_mask']
+        pixel_mask[pixel_mask>0] = 1
+        pixel_mask[pixel_mask==0] = 2
+        pixel_mask[pixel_mask==1] = 0
+        pixel_mask[pixel_mask==2] = 1
+        md['framerate'] = 1./md['frame_time']
         # TODO Return a multi-dimensional PIMS seq.
         return FixedEigerImages(master_path, md)
 
