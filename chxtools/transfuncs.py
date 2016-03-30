@@ -9,7 +9,7 @@ by LW 03/13/2016
 import numpy as np
 from chxtools import xfuncs as xf
 from scipy.optimize import fminbound
-
+from epics import *
 def trans_setup():
     """
     defining physical configuration of CHX transfocator system

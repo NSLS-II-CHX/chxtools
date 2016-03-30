@@ -10,7 +10,8 @@ EIGER_MD_DICT = {
     'frame_time': 'entry/instrument/detector/frame_time',
     'beam_center_x': 'entry/instrument/detector/beam_center_x',
     'beam_center_y': 'entry/instrument/detector/beam_center_y',
-    'count_time': 'entry/instrument/detector/count_time'
+    'count_time': 'entry/instrument/detector/count_time',
+    'pixel_mask': 'entry/instrument/detector/detectorSpecific/pixel_mask',
 }
 
 class FixedEigerImages(EigerImages):
