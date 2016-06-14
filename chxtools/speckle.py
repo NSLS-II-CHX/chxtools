@@ -10,13 +10,18 @@ import six
 import numpy as np
 import time
 
-from skxray.core import roi
-from skxray.core.utils import bin_edges_to_centers, geometric_series
+from skbeam.core import roi
+from skbeam.core.utils import bin_edges_to_centers, geometric_series
 
 import logging
 logger = logging.getLogger(__name__)
 
 import sys
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+from datetime import datetime
 
 def xsvs(image_sets, label_array, number_of_img, timebin_num=2, time_bin=None,
          max_cts=None, bad_images = None, threshold=None):   
@@ -164,7 +169,10 @@ def xsvs(image_sets, label_array, number_of_img, timebin_num=2, time_bin=None,
             # check whether the number of levels is one, otherwise
             # continue processing the next level
             level = 1
-            processing=1   
+            if number_of_img>1:
+                processing=1   
+            else:
+                processing=0
             #print ('track_level: %s'%track_level)
             #while level < num_times:
                 #if not track_level[level]:
@@ -550,4 +558,268 @@ def get_roi(data, threshold=1e-3):
 
 
 
+def plot_sxvs( Knorm_bin_edges, spe_cts_all, uid=None,q_ring_center=None,xlim=[0,3.5],time_steps=None):
+    '''a convinent function to plot sxvs results'''
+    num_rings  = spe_cts_all.shape[1]
+    num_times = Knorm_bin_edges.shape[0]
+    sx = int(round(np.sqrt(num_rings)) )
+    if num_rings%sx == 0: 
+        sy = int(num_rings/sx)
+    else:
+        sy=int(num_rings/sx+1)
+    fig = plt.figure(figsize=(10,6))
+    plt.title('uid= %s'%uid,fontsize=20, y =1.02)  
+    plt.axes(frameon=False)
+    plt.xticks([])
+    plt.yticks([])
+    if time_steps is None:
+        time_steps = [   2**i for i in range(num_times)]
+    for i in range(num_rings):
+        for j in range(num_times):
+            axes = fig.add_subplot(sx, sy, i+1 )
+            axes.set_xlabel("K/<K>")
+            axes.set_ylabel("P(K)")
+            art, = axes.plot(Knorm_bin_edges[j, i][:-1], spe_cts_all[j, i], '-o',
+                         label=str(time_steps[j])+" ms")
+            axes.set_xlim(xlim)
+            axes.set_title("Q "+ '%.4f  '%(q_ring_center[i])+ r'$\AA^{-1}$')
+            axes.legend(loc='best', fontsize = 6)
+    plt.show()
+    fig.tight_layout() 
 
+    
+    
+    
+def fit_xsvs( Knorm_bin_edges, bin_edges,spe_cts_all, K_mean=None,func= 'bn',threshold=1e-7,
+             uid=None,q_ring_center=None,xlim=[0,3.5], ylim=None,time_steps=None):
+    '''a convinent function to plot sxvs results
+         supporting fit function include:
+         'bn': Negative Binomaial Distribution
+         'gm': Gamma Distribution
+         'ps': Poission Distribution
+     
+     '''
+    from lmfit import  Model
+    from scipy.interpolate import UnivariateSpline
+    
+    if func=='bn':
+        mod=Model(nbinom_dist)
+    elif func=='gm':
+        mod = Model(gamma_dist, indepdent_vars=['K'])
+    elif func=='ps':
+        mod = Model(poisson_dist)
+    else:
+        print ("the current supporting function include 'bn', 'gm','ps'")
+        
+    #g_mod = Model(gamma_dist, indepdent_vars=['K'])
+    #g_mod = Model( gamma_dist )
+    #n_mod = Model(nbinom_dist)
+    #p_mod = Model(poisson_dist)
+    #dc_mod = Model(diff_mot_con_factor)
+    
+    num_rings  = spe_cts_all.shape[1]
+    num_times = Knorm_bin_edges.shape[0]
+    
+    M_val = {}
+    K_val = {}
+    sx = int(round(np.sqrt(num_rings)))
+    if num_rings%sx == 0: 
+        sy = int(num_rings/sx)
+    else:
+        sy = int(num_rings/sx+1)
+    fig = plt.figure(figsize=(10, 6))
+    plt.title('uid= %s'%uid+" Fitting with Negative Binomial Function", fontsize=20, y=1.02)  
+    plt.axes(frameon=False)
+    plt.xticks([])
+    plt.yticks([])
+    if time_steps is None:
+        time_steps = [   2**i for i in range(num_times)]
+        
+    for i in range(num_rings):
+        M_val[i]=[]
+        K_val[i]=[]
+        for j in range(   num_times ):
+            # find the best values for K and M from fitting
+            if threshold is not None:
+                rois = get_roi(data=spe_cts_all[j, i], threshold=threshold) 
+            else:
+                rois = range( len( spe_cts_all[j, i] ) )
+            
+            #print ( rois )
+            if func=='bn':
+                result = mod.fit(spe_cts_all[j, i][rois],
+                                 bin_values=bin_edges[j, i][:-1][rois],
+                                 K=5 * 2**j, M=12)
+            elif func=='gm':
+                result = mod.fit(spe_cts_all[j, i][rois] ,
+                             bin_values=bin_edges[j, i][:-1][rois] ,
+                             K=K_mean[i]*2**j,  M= 20 )
+            elif func=='ps':
+                result = mod.fit(spe_cts_all[j, i][rois],
+                             bin_values=bin_edges[j, i][:-1][rois],
+                             K=K_mean[i]*2**j)    
+            else:
+                pass
+             
+            if func=='bn':
+                K_val[i].append(result.best_values['K'])
+                M_val[i].append(result.best_values['M'])
+            elif func=='gm':
+                M_val[i].append(result.best_values['M'])
+            elif func=='ps':
+                K_val[i].append(result.best_values['K'])                
+            else:
+                pass
+            
+            axes = fig.add_subplot(sx, sy, i+1 )
+            axes.set_xlabel("K/<K>")
+            axes.set_ylabel("P(K)")
+
+            #  Using the best K and M values interpolate and get more values for fitting curve
+            fitx_ = np.linspace(0, max(Knorm_bin_edges[j, i][:-1]), 1000     )   
+            fitx = np.linspace(0, max(bin_edges[j, i][:-1]), 1000  )   
+            if func=='bn':
+                fity = nbinom_dist( fitx, K_val[i][j], M_val[i][j] ) # M and K are fitted best values
+                label="nbinom"
+                txt= 'K='+'%.3f'%( K_val[i][0]) +','+ 'M='+'%.3f'%(M_val[i][0])
+            elif func=='gm':
+                fity = gamma_dist( fitx, K_mean[i]*2**j,  M_val[i][j] )
+                label="gamma"
+                txt = 'M='+'%.3f'%(M_val[i][0])
+            elif func=='ps':
+                fity = poisson_dist(fitx, K_val[i][j]  ) 
+                label="poisson"
+                txt = 'K='+'%.3f'%(K_val[i][0])
+            else:pass
+ 
+
+            if j == 0:
+                art, = axes.plot( fitx_,fity, '-b',  label=label)
+            else:
+                art, = axes.plot( fitx_,fity, '-b')
+
+
+            if i==0:    
+                art, = axes.plot( Knorm_bin_edges[j, i][:-1], spe_cts_all[j, i], 'o',
+                         label=str(time_steps[j])+" ms")
+            else:
+                art, = axes.plot( Knorm_bin_edges[j, i][:-1], spe_cts_all[j, i], 'o',
+                         )
+
+
+            axes.set_xlim(0, 3.5)
+            if ylim is not None:
+                axes.set_ylim( ylim)
+            # Annotate the best K and M values on the plot
+            
+            axes.annotate(r'%s'%txt,
+                          xy=(1, 0.25),
+                          xycoords='axes fraction', fontsize=10,
+                          horizontalalignment='right', verticalalignment='bottom')
+            axes.set_title("Q "+ '%.4f  '%(q_ring_center[i])+ r'$\AA^{-1}$')
+            axes.legend(loc='best', fontsize = 6)
+    plt.show()
+    fig.tight_layout()  
+    
+    return M_val, K_val
+
+
+def plot_xsvs_g2( g2, taus, res_pargs=None, *argv,**kwargs):     
+    '''plot g2 results, 
+       g2: one-time correlation function
+       taus: the time delays  
+       res_pargs, a dict, can contains
+           uid/path/qr_center/qz_center/
+       kwargs: can contains
+           vlim: [vmin,vmax]: for the plot limit of y, the y-limit will be [vmin * min(y), vmx*max(y)]
+           ylim/xlim: the limit of y and x
+       
+       e.g.
+       plot_gisaxs_g2( g2b, taus= np.arange( g2b.shape[0]) *timeperframe, q_ring_center = q_ring_center, vlim=[.99, 1.01] )
+           
+      ''' 
+
+    
+    if res_pargs is not None:
+        uid = res_pargs['uid'] 
+        path = res_pargs['path'] 
+        q_ring_center = res_pargs[ 'q_ring_center']
+
+    else:
+        
+        if 'uid' in kwargs.keys():
+            uid = kwargs['uid'] 
+        else:
+            uid = 'uid'
+
+        if 'q_ring_center' in kwargs.keys():
+            q_ring_center = kwargs[ 'q_ring_center']
+        else:
+            q_ring_center = np.arange(  g2.shape[1] )
+
+        if 'path' in kwargs.keys():
+            path = kwargs['path'] 
+        else:
+            path = ''
+    
+    num_rings = g2.shape[1]
+    sx = int(round(np.sqrt(num_rings)) )
+    if num_rings%sx == 0: 
+        sy = int(num_rings/sx)
+    else:
+        sy=int(num_rings/sx+1)  
+    
+    #print (num_rings)
+    if num_rings!=1:
+        
+        #fig = plt.figure(figsize=(14, 10))
+        fig = plt.figure(figsize=(12, 10))
+        plt.axis('off')
+        #plt.axes(frameon=False)
+        #print ('here')
+        plt.xticks([])
+        plt.yticks([])
+
+        
+    else:
+        fig = plt.figure(figsize=(8,8))
+        
+        
+        
+    plt.title('uid= %s'%uid,fontsize=20, y =1.06)        
+    for i in range(num_rings):
+        ax = fig.add_subplot(sx, sy, i+1 )
+        ax.set_ylabel("beta") 
+        ax.set_title(" Q= " + '%.5f  '%(q_ring_center[i]) + r'$\AA^{-1}$')
+        y=g2[:, i]
+        #print (y)
+        ax.semilogx(taus, y, '-o', markersize=6) 
+        #ax.set_ylim([min(y)*.95, max(y[1:])*1.05 ])
+        if 'ylim' in kwargs:
+            ax.set_ylim( kwargs['ylim'])
+        elif 'vlim' in kwargs:
+            vmin, vmax =kwargs['vlim']
+            ax.set_ylim([min(y)*vmin, max(y[1:])*vmax ])
+        else:
+            pass
+        if 'xlim' in kwargs:
+            ax.set_xlim( kwargs['xlim'])
+ 
+ 
+    dt =datetime.now()
+    CurTime = '%s%02d%02d-%02d%02d-' % (dt.year, dt.month, dt.day,dt.hour,dt.minute)        
+                
+    fp = path + 'g2--uid=%s'%(uid) + CurTime + '.png'
+    fig.savefig( fp, dpi=fig.dpi)        
+    fig.tight_layout()  
+    plt.show()
+
+    
+    
+    
+    
+    
+    
+    
+    
+    

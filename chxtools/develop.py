@@ -10,13 +10,13 @@ from __future__ import absolute_import, division, print_function
 
 from databroker import DataBroker as db, get_images, get_table, get_events
 from filestore.api import register_handler, deregister_handler
-from filestore.retrieve import _h_registry, _HANDLER_CACHE
+#from filestore.retrieve import _h_registry, _HANDLER_CACHE
 
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-import skxray.core.roi as roi
+import skbeam.core.roi as roi
 from datetime import datetime
 
 import logging
@@ -29,10 +29,10 @@ import xray_vision.mpl_plotting as mpl_plot
 from xray_vision.mpl_plotting import speckle
 from xray_vision.mask.manual_mask import ManualMask
 
-import skxray.core.roi as roi
+import  skbeam.core.roi as roi
 
-import skxray.core.correlation as corr
-import skxray.core.utils as utils
+import skbeam.core.correlation as corr
+import skbeam.core.utils as utils
 
 
 
@@ -198,7 +198,7 @@ class LazyEigerHandler(HandlerBase):
         return FixedEigerImages(master_path, md)
 
 deregister_handler('AD_EIGER')
-_HANDLER_CACHE.clear()
+#_HANDLER_CACHE.clear()
 register_handler('AD_EIGER', LazyEigerHandler)
 
 

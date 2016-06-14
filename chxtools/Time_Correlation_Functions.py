@@ -9,7 +9,7 @@
 import numpy as np
 import sys
 import time
-import skxray.core.roi as roi
+import skbeam.core.roi as roi
 from matplotlib import gridspec
 
 import itertools
@@ -1138,7 +1138,7 @@ class Get_Pixel_Array(object):
         '''
         self.indexable = indexable
         self.pixelist = pixelist
-        self.shape = indexable.shape
+        #self.shape = indexable.shape
         try:
             self.length= len(indexable)
         except:
@@ -1161,19 +1161,15 @@ class Get_Pixel_Array(object):
 
 
 class Reverse_Coordinate(object):
-    '''
-    a class 
-    to reverse the images in y-direction
-    due to the coordination difference between python and Eiger software
-    
-    One example:        
-        imgsr =   Reverse_Coordinate( imgs, mask)
-    '''
-    
     def __init__(self, indexable, mask):
         self.indexable = indexable
         self.mask = mask
-        self.shape = indexable.shape
+        try:
+            self.shape  = indexable.shape
+        except:
+            #if 
+            self.shape  =  [len(indexable), indexable[0].shape[0], indexable[0].shape[1] ]
+        #self.shape = indexable.shape
         self.length= len(indexable)
     def __getitem__(self, key ):      
         if self.mask is not None:
@@ -1185,8 +1181,7 @@ class Reverse_Coordinate(object):
             img_=img[:,::-1,:]
         if len(img.shape)==2:
             img_=img[::-1,:] 
-        return img_
- 
+        return img_ 
 
  
 
@@ -1221,10 +1216,169 @@ def get_mean_intensity( data_pixel, qind):
 
 
 
+def show_C12(C12, qz_ind=0, qr_ind=0, N1=None,N2=None, vmin=None, vmax=None, title=False):
+    
+    g12_num =  qz_ind * num_qr + qr_ind
+    if N1 is None:
+        N1=0
+    if N2 is None:
+        N2=Nming
+    if vmin is None:
+        vmin = 1
+    if vmax is None:
+        vmax = 1.02
+    data = g12b[N1:N2,N1:N2,g12_num]
+    fig, ax = plt.subplots()
+    im=ax.imshow( data, origin='lower' , cmap='viridis', 
+                 norm= LogNorm( vmin, vmax ), 
+            extent=[0, data.shape[0]*timeperframe, 0, data.shape[0]*timeperframe ] )
+    #ax.set_title('%s-%s frames--Qth= %s'%(N1,N2,g12_num))
+    if title:
+        ax.set_title('%s-%s frames--Qz= %s--Qr= %s'%(N1,N2, qz_center[qz_ind], qr_center[qr_ind] ))
+    ax.set_xlabel( r'$t_1$ $(s)$', fontsize = 18)
+    ax.set_ylabel( r'$t_2$ $(s)$', fontsize = 18)
+    fig.colorbar(im)
+    
+    plt.show()    
+
+
+def show_C12(C12, q_ind=0,  *argv,**kwargs):  
+ 
+    '''
+    plot one-q of two-time correlation function
+    C12: two-time correlation function, with shape as [ time, time, qs]
+    q_ind: if integer, for a SAXS q, the nth of q to be plotted
+            if a list: for a GiSAXS [qz_ind, qr_ind]  
+    kwargs: support        
+        timeperframe: the time interval
+        N1: the start frame(time)
+        N2: the end frame(time)
+        vmin/vmax: for plot
+        title: if True, show the tile
+    
+    e.g.,
+        show_C12(g12b, q_ind=1, N1=0, N2=500, vmin=1.05, vmax=1.07,  )
+    
+    '''
+  
+    #strs =  [ 'timeperframe', 'N1', 'N2', 'vmin', 'vmax', 'title'] 
+    
+    shape = C12.shape
+    if isinstance(q_ind, int):
+        C12_num = q_ind
+    else:
+        qz_ind, qr_ind = q_ind
+        C12_num =  qz_ind * num_qr + qr_ind 
+    
+    if 'timeperframe' in kwargs.keys():
+        timeperframe =  kwargs['timeperframe']
+    else:
+        timeperframe=1
+        
+    if 'vmin' in kwargs.keys():
+        vmin =  kwargs['vmin']
+    else:
+        vmin=1
+    if 'vmax' in kwargs.keys():
+        vmax =  kwargs['vmax']
+    else:
+        vmax=1.05        
+        
+    if 'N1' in kwargs.keys():
+        N1 =  kwargs['N1']
+    else:
+        N1=0
+        
+    if 'N2' in kwargs.keys():
+        N2 =  kwargs['N2']
+    else:
+        N2= shape[0]
+    if 'title' in kwargs.keys():
+        title =  kwargs['title']
+    else:
+        title=True        
+
+    data = C12[N1:N2,N1:N2,C12_num]
+    fig, ax = plt.subplots()
+    im=ax.imshow( data, origin='lower' , cmap='viridis', 
+                 norm= LogNorm( vmin, vmax ), 
+            extent=[0, data.shape[0]*timeperframe, 0, data.shape[0]*timeperframe ] )
+    if title:
+        if isinstance(q_ind, int):
+            ax.set_title('%s-%s frames--Qth= %s'%(N1,N2,C12_num))
+        else:
+            ax.set_title('%s-%s frames--Qzth= %s--Qrth= %s'%(N1,N2, qz_ind, qr_ind ))
+        
+        #ax.set_title('%s-%s frames--Qth= %s'%(N1,N2,g12_num))
+    ax.set_xlabel( r'$t_1$ $(s)$', fontsize = 18)
+    ax.set_ylabel( r'$t_2$ $(s)$', fontsize = 18)
+    fig.colorbar(im)
+    plt.show()   
 
 
 
 
+def plot_saxs_g2( g2, taus,  *argv,**kwargs):     
+    '''plot g2 results, 
+       g2: one-time correlation function
+       taus: the time delays        
+       kwargs: can contains
+           vlim: [vmin,vmax]: for the plot limit of y, the y-limit will be [vmin * min(y), vmx*max(y)]
+           ylim/xlim: the limit of y and x
+       
+       e.g.
+       plot_saxs_g2( g2b, taus= np.arange( g2b.shape[0]) *timeperframe, q_ring_center = q_ring_center, vlim=[.99, 1.01] )
+           
+      ''' 
+     
+    
+    if 'uid' in kwargs.keys():
+        uid = kwargs['uid'] 
+    else:
+        uid = 'uid'
+        
+    if 'q_ring_center' in kwargs.keys():
+        q_ring_center = kwargs[ 'q_ring_center']
+    else:
+        q_ring_center = np.arange(  g2.shape[1] )
+    
 
-
-
+    
+    num_rings = g2.shape[1]
+    sx = int(round(np.sqrt(num_rings)) )
+    if num_rings%sx == 0: 
+        sy = int(num_rings/sx)
+    else:
+        sy=int(num_rings/sx+1)
+        
+    uid = 'uid'
+    if 'uid' in kwargs.keys():
+        uid = kwargs['uid']  
+        
+    fig = plt.figure(figsize=(14, 10))
+    plt.title('uid= %s'%uid,fontsize=20, y =1.06)
+    plt.axis('off')
+    #plt.axes(frameon=False)
+    plt.xticks([])
+    plt.yticks([])
+    for i in range(num_rings):
+        ax = fig.add_subplot(sx, sy, i+1 )
+        ax.set_ylabel("g2") 
+        ax.set_title(" Q= " + '%.5f  '%(q_ring_center[i]) + r'$\AA^{-1}$')
+        y=g2[:, i]
+        ax.semilogx(taus, y, '-o', markersize=6) 
+        #ax.set_ylim([min(y)*.95, max(y[1:])*1.05 ])
+        if 'ylim' in kwargs:
+            ax.set_ylim( kwargs['ylim'])
+        elif 'vlim' in kwargs:
+            vmin, vmax =kwargs['vlim']
+            ax.set_ylim([min(y)*vmin, max(y[1:])*vmax ])
+        else:
+            pass
+        if 'xlim' in kwargs:
+            ax.set_xlim( kwargs['xlim'])
+ 
+    plt.show()
+    fig.tight_layout() 
+    
+    
