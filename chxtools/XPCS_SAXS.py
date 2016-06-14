@@ -1,4 +1,4 @@
-from chx_generic_functions import *
+from .chx_generic_functions import *
 
 
     

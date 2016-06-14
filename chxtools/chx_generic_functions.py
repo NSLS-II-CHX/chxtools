@@ -1,4 +1,4 @@
-from chx_libs import *
+from .chx_libs import *
 
 #####
 #load data by databroker    
