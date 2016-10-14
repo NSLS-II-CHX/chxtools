@@ -1,4 +1,4 @@
-from filestore.api import register_handler, deregister_handler
+from databroker import db
 from filestore.retrieve import HandlerBase
 from chxtools.pims_readers.eiger import EigerImages
 
@@ -18,15 +18,15 @@ class FixedEigerImages(EigerImages):
     def __init__(self, path, metadata):
         super().__init__(path)
         self._metadata = metadata
-    
+
     @property
     def md(self):
         return self._metadata
-    
+
     @property
     def dtype(self):
         return self.pixel_type
-    
+
     @property
     def shape(self):
         return self.frame_shape
@@ -63,5 +63,5 @@ class LazyEigerHandler(HandlerBase):
         # TODO Return a multi-dimensional PIMS seq.
         return FixedEigerImages(master_path, md)
 
-deregister_handler('AD_EIGER')
-register_handler('AD_EIGER', LazyEigerHandler)
+db.fs.deregister_handler('AD_EIGER')
+db.fs.register_handler('AD_EIGER', LazyEigerHandler)
