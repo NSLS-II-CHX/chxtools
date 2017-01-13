@@ -15,6 +15,31 @@ pv_px = 'XF:11IDB-BI{XBPM:02}FA-X'
 pv_py = 'XF:11IDB-BI{XBPM:02}FA-Y'
 pv_sumi='XF:11IDB-BI{XBPM:02}FA-S'
 
+meta_pvdict = dict(
+
+pv_Px = 'XF:11IDB-BI{XBPM:02}Fdbk:AKp-SP',
+pv_Ix = 'XF:11IDB-BI{XBPM:02}Fdbk:AKi-SP',
+pv_Dx = 'XF:11IDB-BI{XBPM:02}Fdbk:AKd-SP',
+pv_fdx= 'XF:11IDB-BI{XBPM:02}Fdbk:AEn-SP',
+pv_sklx= 'XF:11IDB-BI{XBPM:02}Fdbk:ACtrlScaleFactor-SP',
+pv_Kx = 'XF:11IDB-BI{XBPM:02}Pos:Kx-SP',
+
+pv_Py = 'XF:11IDB-BI{XBPM:02}Fdbk:BKp-SP',  
+pv_Iy = 'XF:11IDB-BI{XBPM:02}Fdbk:BKi-SP',
+pv_Dy = 'XF:11IDB-BI{XBPM:02}Fdbk:BKd-SP',
+pv_fdy= 'XF:11IDB-BI{XBPM:02}Fdbk:BEn-SP',
+pv_skly= 'XF:11IDB-BI{XBPM:02}Fdbk:BCtrlScaleFactor-SP',
+pv_Ky = 'XF:11IDB-BI{XBPM:02}Pos:Ky-SP',
+
+pv_fdHz = 'XF:11IDB-BI{XBPM:02}Fdbk:delT-I',
+    )
+#'pv_Px', 'pv_Ix', 'pv_Dx', 'pv_fdx', 'pv_sklx', 'pv_Kx', 
+#'pv_Py', 'pv_Iy', 'pv_Dy', 'pv_fdy', 'pv_skly', 'pv_Ky', 
+#'pv_fdHz'
+
+ 
+
+
 pv_num_sam = 'XF:11IDB-BI{XBPM:02}Trig:NumSamples-SP'
 pv_trig = 'XF:11IDB-BI{XBPM:02}FaSoftTrig-SP'
 
@@ -50,10 +75,11 @@ def get_fft( t,y ):
     return F,Y  
 
 
-def plot_current(t, ca,cb,cc,cd,sumi, res_path, filename  ):
+def plot_current(t, ca,cb,cc,cd,sumi, res_path, filename, metadata  ):
     fig = plt.figure(figsize=(8,12)) 
     plt.axis('off')
-    plt.title(filename)
+    plt.title(filename + '_' + str( round(1/metadata['pv_fdHz'],1) ) + ' Hz')
+    #plt.title(filename)
     colms =  ['A', 'B','C','D', 'Sum']
     for n,i in   enumerate(  [ ca,cb,cc,cd,sumi  ]  ):
         y = i
@@ -70,10 +96,11 @@ def plot_current(t, ca,cb,cc,cd,sumi, res_path, filename  ):
 
 
 
-def plot_posxy_fft(t,posx,posy,res_path, filename  ):
+def plot_posxy_fft(t,posx,posy,res_path, filename, metadata  ):   
+            
     fig = plt.figure(figsize=(12,10))
     plt.axis('off')
-    plt.title(filename)
+    plt.title(filename + '_' + str( round(1/metadata['pv_fdHz'],1) ) + ' Hz')
     ax = fig.add_subplot( 221 )
     #ax.set_title(filename )
     y = posx        
@@ -118,10 +145,15 @@ def plot_posxy_fft(t,posx,posy,res_path, filename  ):
     ax.set_xlabel("freq, (Hz)")
     ax.set_ylabel("fft_x")
     ax.set_xlim( 0, 500)
-    ax.legend( loc='best', fontsize = 16)
+    ax.legend( loc='best', fontsize = 16)    
 
-    ax = fig.add_subplot( 224 )    
-     
+    pp = 'x'
+    txt1 = 'P I D: %s  %s  %s, Scaling: %s'%( metadata['pv_P%s'%pp], metadata['pv_I%s'%pp], metadata['pv_D%s'%pp],metadata['pv_skl%s'%pp] )
+    ax.text(x = .4, y= 0.7,  s= txt1, fontsize=14, transform=ax.transAxes) 
+    txt2 = 'K%s: %s, Feedback: %s'%(pp, metadata['pv_K%s'%pp], metadata['pv_fd%s'%pp] )
+    ax.text(x = .4, y= 0.6,  s= txt2, fontsize=14, transform=ax.transAxes) 
+    
+    ax = fig.add_subplot( 224 )  
     yt = posy
     freq,fft =  get_fft( t,yt )
     ax.plot(freq,fft, '--o', label="FFT-PosY")
@@ -129,12 +161,16 @@ def plot_posxy_fft(t,posx,posy,res_path, filename  ):
     ax.set_ylabel("fft_y")
     ax.set_xlim( 0, 500)
     ax.legend( loc='best', fontsize = 16)    
+        
+    pp = 'y'
+    txt1 = 'P I D: %s  %s  %s, Scaling: %s'%( metadata['pv_P%s'%pp], metadata['pv_I%s'%pp], metadata['pv_D%s'%pp],metadata['pv_skl%s'%pp] )
+    ax.text(x = .4, y= 0.7,  s= txt1, fontsize=14, transform=ax.transAxes) 
+    txt2 = 'K%s: %s, Feedback: %s'%(pp, metadata['pv_K%s'%pp], metadata['pv_fd%s'%pp] )
+    ax.text(x = .4, y= 0.6,  s= txt2, fontsize=14, transform=ax.transAxes) 
     
-    fig.tight_layout()
-    
+    fig.tight_layout()    
     plt.savefig( res_path + filename  + '-fft-time_posX-Y-rms.png')
-    plt.show()
-    
+    plt.show()    
     
     
 def plot_posxy_rms(t,posx,posy,res_path, filename  ):
@@ -232,7 +268,7 @@ def plot_fft_posxy(t,posx,posy,res_path, filename  ):
     plt.show()
     
 
-def bpm_read( num_sample, filename=None,rate=10 ):
+def bpm_read( num_sample, filename=None,rate=10, show_trace=False ):
     '''rate: the data acq rate in unit K'''
     rate = rate*1000.  #10 KHz
     dt =datetime.now()
@@ -246,6 +282,10 @@ def bpm_read( num_sample, filename=None,rate=10 ):
     colms = ['A', 'B','C','D', 'X','Y','Sum']
 
     num_sample *= rate
+    metadata = {}
+    for k in list(meta_pvdict.keys()):
+        metadata[k] = caget( meta_pvdict[k] )    
+ 
     if num_sample<13E4:
         caput( pv_num_sam, num_sample)
         caput( pv_trig, 0 )
@@ -275,9 +315,10 @@ def bpm_read( num_sample, filename=None,rate=10 ):
         sumi= data[6]
         #plot_posxy(t,posx,posy, save_path, filename )
         #plot_posxy_rms(t,posx,posy,res_path, filename  )
-        #plot_fft_posxy(t,posx,posy,res_path, filename  )
-        plot_posxy_fft(t,posx,posy,res_path, filename  )
-        plot_current(t, ca,cb,cc,cd, sumi, res_path, filename  )
+        #plot_fft_posxy(t,posx,posy,res_path, filename  ) 
+        plot_posxy_fft(t,posx,posy,res_path, filename, metadata = metadata  )
+        if show_trace:
+            plot_current(t, ca,cb,cc,cd, sumi, res_path, filename, metadata = metadata  )
     else:
         print ('The sample number is too large,this number should < 13E4!')
                         
