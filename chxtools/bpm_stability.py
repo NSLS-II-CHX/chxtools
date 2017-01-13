@@ -52,6 +52,7 @@ def get_fft( t,y ):
 
 def plot_current(t, ca,cb,cc,cd,sumi, res_path, filename  ):
     fig = plt.figure(figsize=(8,12)) 
+    plt.axis('off')
     plt.title(filename)
     colms =  ['A', 'B','C','D', 'Sum']
     for n,i in   enumerate(  [ ca,cb,cc,cd,sumi  ]  ):
@@ -71,6 +72,7 @@ def plot_current(t, ca,cb,cc,cd,sumi, res_path, filename  ):
 
 def plot_posxy_fft(t,posx,posy,res_path, filename  ):
     fig = plt.figure(figsize=(12,10))
+    plt.axis('off')
     plt.title(filename)
     ax = fig.add_subplot( 221 )
     #ax.set_title(filename )
@@ -137,6 +139,7 @@ def plot_posxy_fft(t,posx,posy,res_path, filename  ):
     
 def plot_posxy_rms(t,posx,posy,res_path, filename  ):
     fig = plt.figure(figsize=(8,6))
+    plt.axis('off')
     ax = fig.add_subplot( 211 )
     ax.set_title(filename )
     y = posx        
@@ -177,6 +180,7 @@ def plot_posxy_rms(t,posx,posy,res_path, filename  ):
 
 def plot_posxy(t,posx,posy,res_path, filename  ):
     fig = plt.figure(figsize=(8,6))
+    plt.axis('off')
     ax = fig.add_subplot( 211 )
     ax.set_title(filename )
  
@@ -205,27 +209,23 @@ def plot_posxy(t,posx,posy,res_path, filename  ):
     
 def plot_fft_posxy(t,posx,posy,res_path, filename  ):
     fig = plt.figure(figsize=(8,6))
-    ax = fig.add_subplot( 211 )
+    plt.axis('off')    
+    ax = fig.add_subplot( 211 )    
     ax.set_title(filename )
-    yt = posx
-         
+    yt = posx         
     freq,fft =  get_fft( t,yt )
-
     ax.plot(freq,fft, '--o', label="FFT-posX" )
     ax.set_xlabel("freq, (Hz)")
     ax.set_ylabel("fft_x")
     ax.set_xlim( 0, 500)
     ax.legend( loc='best', fontsize = 16)
-
-    ax = fig.add_subplot( 212 )    
-     
+    ax = fig.add_subplot( 212 ) 
     yt = posy
     freq,fft =  get_fft( t,yt )
     ax.plot(freq,fft, '--o', label="FFT-PosY")
     ax.set_xlabel("freq, (Hz)")
     ax.set_ylabel("fft_y")
     ax.set_xlim( 0, 500)
-
     ax.legend( loc='best', fontsize = 16) 
     #try filename = filename.rstrip('.txt')
     plt.savefig( res_path + filename.rstrip('.txt') + '-fft_posX-Y.png')
