@@ -21,9 +21,8 @@ from os.path import isfile, join
 import re
 
 # path to X-ray data files
-#datapath='/nfs/xf11id/shared/xfuncs/X-ray_database/'
 datapath='/home/xf11id/Repos/chxtools/chxtools/X-ray_database/'
-
+default_id='CHX_IVU20_01162017';
 
 def get_Lambda(E,u='SI'):
     """
@@ -358,11 +357,11 @@ def get_Vineyard(Qz,E=8,ra0=1):
          else: V[i]=2*rx[i]/(rx[i]+np.sqrt(rx[i]**2-1))
     return V
 
-def get_gap(E,harmonic=3,ID='CHX_IVU20_12202014'):
+def get_gap(E,harmonic=3,ID=default_id):
     """    
     by LW 12/03/2014, function calculates the undulator gap for a requested energy
     and harmonic based on magnetic measurement data in the database 
-    type get_gap(E [kev], harmonic [integer] (default=3), id (default+'CHX_IVU20_12202014')); 
+    type get_gap(E [kev], harmonic [integer] (default=3), id (default: defined by 'default_id')); 
     E can be an array of energies. Type get_gap\"ID?\") for a list of available magnetic datasets.
     """
     #get list_of available magnetic measurements from data file directory:
@@ -391,12 +390,12 @@ def get_gap(E,harmonic=3,ID='CHX_IVU20_12202014'):
         else: raise xfuncs_Exception('error: non recognized magnetic data. Type get_gap(\'ID?\') for a list of available mangetic datasets.')
        
 
-def get_Es(gap,harmonic=[1,2,3,4,5],ID='CHX_IVU20_12202014'):
+def get_Es(gap,harmonic=[1,2,3,4,5],ID=default_id):
     """
     by LW 12/03/2014,
     function calculates the X-ray energies for a given undulator gap and set of harmonics
     based on magnetic measurement data in the database 
-    type get_Es(gap [mm], harmonic [integer] (default=[1,2,3,4,5]), id (default:'CHX_IVU20_12202014'))
+    type get_Es(gap [mm], harmonic [integer] (default=[1,2,3,4,5]), id (default: defined by 'default_id')); 
     harmonic can be a list of integers. Type get_Es(\"ID?\") for a list of available magnetic datasets
     """
     #get list_of available magnetic measurements from data file directory:
