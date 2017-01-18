@@ -8,10 +8,11 @@ version 0.1.1: added get_gap & get_Es
 version 0.1.2: added get_EBragg
 version 0.1.3: fixed error messages in get_gap and get_Es
 version 0.1.4: added lattice spacings for Si111 and Si220 @80K (from XOP) (02/26/2015)
-version 0.2.0: (this file) fixed some problems wiht arrays as inputs, e.g. in get_gap  
+version 0.2.0: fixed some problems wiht arrays as inputs, e.g. in get_gap  
                and changed the help files to use the standard python 'help' and docstring functions;
                added xfuncs_exeption class for handling xfuncs specific exeptions within python (03/23/2015)
                added get_pinflux: calculates photon flux from photo current from pin diode
+version 0.2.1: (this file) changed ID selection for gap function to 'default_id'
 """
 
 import pylab as pl
