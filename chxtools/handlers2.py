@@ -48,10 +48,6 @@ class EigerImages2(FramesSequence):
         return self[0].dtype
 
     @property
-    def md(self):
-        return self._metadata
-
-    @property
     def dtype(self):
         return self.pixel_type
 
@@ -75,7 +71,7 @@ class EigerHandler2:
         'count_time': 'entry/instrument/detector/count_time',
         'pixel_mask': 'entry/instrument/detector/detectorSpecific/pixel_mask',
     }
-    specs = {'AD_EIGER'}
+    specs = {'AD_EIGER2'}
     def __init__(self, fpath, images_per_file):
         # create pims handler
         self._base_path = fpath
@@ -100,4 +96,8 @@ class EigerHandler2:
         # TODO Return a multi-dimensional PIMS seq.
         return EigerImages2(master_path, self._images_per_file, md=md)
 
+db.fs.deregister_handler('AD_EIGER')
+db.fs.deregister_handler('AD_EIGER2')
+
 db.fs.register_handler('AD_EIGER2', EigerHandler2)
+db.fs.register_handler('AD_EIGER', LazyEigerHandler)
