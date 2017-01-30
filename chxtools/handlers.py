@@ -45,7 +45,7 @@ class LazyEigerHandler(HandlerBase):
         import h5py
         master_path = '{}_{}_master.h5'.format(self._base_path, seq_id)
         md = {}
-        print('hdf5 path = %s' % master_path)
+        #print('hdf5 path = %s' % master_path)
         with h5py.File(master_path, 'r') as f:
             md = {k: f[v].value for k, v in self.vals_dict.items()}
         # the pixel mask from the eiger contains:
@@ -63,5 +63,5 @@ class LazyEigerHandler(HandlerBase):
         # TODO Return a multi-dimensional PIMS seq.
         return FixedEigerImages(master_path, md)
 
-db.fs.deregister_handler('AD_EIGER')
+#db.fs.deregister_handler('AD_EIGER')
 db.fs.register_handler('AD_EIGER', LazyEigerHandler)
