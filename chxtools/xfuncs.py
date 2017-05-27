@@ -13,7 +13,6 @@ version 0.2.0: fixed some problems wiht arrays as inputs, e.g. in get_gap
                added xfuncs_exeption class for handling xfuncs specific exeptions within python (03/23/2015)
                added get_pinflux: calculates photon flux from photo current from pin diode
 version 0.2.1: (this file) changed ID selection for gap function to 'default_id'
-a test here
 """
 
 import pylab as pl
