@@ -55,17 +55,14 @@ def get_fft( t,y ):
     L = len(t)
     tp = np.array(t, dtype = float)
     yp=np.array( y, dtype = float)
-    ts = (t[L-1] - t[0])/float(L)
-    print (ts)
+    ts = (t[L-1] - t[0])/float(L)    
     tm= 2 * L * ts
     xs =  1/ tm 
     ps = np.abs( np.fft.fft(  yp ) )
-    time_step =   ts
-    #print time_step
+    time_step =   ts    
     freqs = np.fft.fftfreq(yp.size, time_step)
     idx = np.argsort(freqs)
-
-    F,Y = freqs[idx][L/2+1:], ps[idx][L/2+1:]
+    F,Y = freqs[idx][int(L/2+1):], ps[idx][int(L/2+1):]
     ##  Find the peak in the coefficients
     idxm = np.argmax( Y )
     freq = F[idxm]
@@ -130,17 +127,13 @@ def plot_posxy_fft(t,posx,posy,res_path, filename, metadata  ):
 
     ax.set_xlabel("Time, (s)")
     ax.set_ylabel("Y")    
-
-
     ax.legend( loc='best', fontsize = 16) 
     #try filename = filename.rstrip('.txt')
     
     ax = fig.add_subplot( 222 )
     #ax.set_title(filename )
     yt = posx
-         
     freq,fft =  get_fft( t,yt )
-
     ax.plot(freq,fft, '--o', label="FFT-posX" )
     ax.set_xlabel("freq, (Hz)")
     ax.set_ylabel("fft_x")
