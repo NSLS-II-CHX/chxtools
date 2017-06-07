@@ -223,7 +223,7 @@ def get_Bragg(reflection,E=8.):
         else: print ('error: reflection not found. Type get_Bragg("reflections?") for list of available reflections.')
     else: print ('error: reflection has to be a string and E needs to be numeric. Type get_Bragg? for help')
 
-def get_EBragg(reflection,theta_Bragg=12.0):
+def get_EBragg(reflection,theta_Bragg=12.0, d_spacing=None):
      """
      by LW 17/03/2010
      function returns the X-ray energy [keV] of a given crystal and Bragg reflection.
@@ -231,6 +231,7 @@ def get_EBragg(reflection,theta_Bragg=12.0):
      E: x-ray energy in keV (can be an array of energies), 
      reflection: string, e.g. 'Si111'. Reflections implemented from http://database.iem.ac.ru/mincryst, T=25C or calculated from XOP, e.g. for Si111 and Si220 @80K
      type get_Bragg(\'reflections?\') for a list of currently availabel materials
+     by MR 06/07/2017: added optional argument to pass an arbitrary d-spacing [A].
      """
      reflstr=['Si111cryo','Si220cryo','Si111', 'Si220', 'Si113', 'Si224', 'Si331', 'Si400','Ge111', 'Ge220', 'Ge113', 'Ge224', 'Ge331', 'Ge620', 'Ge531', 'Ge400', 'Ge115', 'Ge335','Ge440', 'Ge444', 'Ge333', 'C111', 'C220']
      dspace=np.array([3.13379852,1.91905183,3.13542,1.92004,1.63742,1.10854,1.24589,1.35767,3.26627,2.00018,1.70576,1.15480,1.29789,0.89451,0.95627,1.41434,1.08876,0.86274,1.00009,0.81657,1.08876,2.05929,1.26105])
@@ -242,16 +243,19 @@ def get_EBragg(reflection,theta_Bragg=12.0):
 
      if isinstance(reflection,str): # and all(isinstance(E, (int, long, float, complex)) for item in [E,E]): # <- bug in python: check for E is numeric works in standalone function, but not in this package => don't check
          theta_Bragg=np.array(theta_Bragg)
-         if reflection in reflstr:
-             ind=reflstr.index(reflection)
-             #print reflstr[ind] +': d_{hkl}=' + "%3.4f" %dspace[ind] +'A   I/I_o='+ "%3.4f" %Irel[ind]
-             ds=[];I=[]
-             for l in range(0,np.size(theta_Bragg)):
-                 ds.append(dspace[ind])
-                 I.append(Irel[ind])
+         if reflection in reflstr or d_spacing:
+             if not d_spacing:
+                 ind=reflstr.index(reflection)
+                 #print reflstr[ind] +': d_{hkl}=' + "%3.4f" %dspace[ind] +'A   I/I_o='+ "%3.4f" %Irel[ind]
+                 ds=[];I=[]
+                 for l in range(0,np.size(theta_Bragg)):
+                     ds.append(dspace[ind])
+                     I.append(Irel[ind])
+             else:
+                 ds = [d_spacing] * len(theta_Bragg)
              dspace=np.array(ds)
              lam=2*dspace*np.sin(theta_Bragg/180*np.pi)
-             EthetaB=hPlank*cvac/(lam*Qelectron)*1e7;
+             EthetaB=hPlank*cvac/(lam*Qelectron)*1e7
              return EthetaB.T
          elif reflection=='reflections?':
              print ('List of available reflections (T=25C):')
