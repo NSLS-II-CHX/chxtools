@@ -93,7 +93,7 @@ def plot_current(t, ca,cb,cc,cd,sumi, res_path, filename, metadata  ):
 
 
 
-def plot_posxy_fft(t,posx,posy,res_path, filename, metadata  ):   
+def plot_posxy_fft(t,posx,posy,res_path, filename, metadata, frequency_range=[0,500]  ):   
             
     fig = plt.figure(figsize=(12,10))
     plt.axis('off')
@@ -137,7 +137,7 @@ def plot_posxy_fft(t,posx,posy,res_path, filename, metadata  ):
     ax.plot(freq,fft, '--o', label="FFT-posX" )
     ax.set_xlabel("freq, (Hz)")
     ax.set_ylabel("fft_x")
-    ax.set_xlim( 0, 500)
+    ax.set_xlim( frequency_range)
     ax.legend( loc='best', fontsize = 16)    
 
     pp = 'x'
@@ -152,7 +152,7 @@ def plot_posxy_fft(t,posx,posy,res_path, filename, metadata  ):
     ax.plot(freq,fft, '--o', label="FFT-PosY")
     ax.set_xlabel("freq, (Hz)")
     ax.set_ylabel("fft_y")
-    ax.set_xlim( 0, 500)
+    ax.set_xlim( frequency_range)
     ax.legend( loc='best', fontsize = 16)    
         
     pp = 'y'
@@ -236,7 +236,7 @@ def plot_posxy(t,posx,posy,res_path, filename  ):
     
     
     
-def plot_fft_posxy(t,posx,posy,res_path, filename  ):
+def plot_fft_posxy(t,posx,posy,res_path, filename,frequency_range=[0,500]  ):
     fig = plt.figure(figsize=(8,6))
     plt.axis('off')    
     ax = fig.add_subplot( 211 )    
@@ -246,7 +246,7 @@ def plot_fft_posxy(t,posx,posy,res_path, filename  ):
     ax.plot(freq,fft, '--o', label="FFT-posX" )
     ax.set_xlabel("freq, (Hz)")
     ax.set_ylabel("fft_x")
-    ax.set_xlim( 0, 500)
+    ax.set_xlim( frequency_range)
     ax.legend( loc='best', fontsize = 16)
     ax = fig.add_subplot( 212 ) 
     yt = posy
@@ -254,7 +254,7 @@ def plot_fft_posxy(t,posx,posy,res_path, filename  ):
     ax.plot(freq,fft, '--o', label="FFT-PosY")
     ax.set_xlabel("freq, (Hz)")
     ax.set_ylabel("fft_y")
-    ax.set_xlim( 0, 500)
+    ax.set_xlim( frequency_range)
     ax.legend( loc='best', fontsize = 16) 
     #try filename = filename.rstrip('.txt')
     plt.savefig( res_path + filename.rstrip('.txt') + '-fft_posX-Y.png')
