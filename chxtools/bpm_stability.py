@@ -261,7 +261,7 @@ def plot_fft_posxy(t,posx,posy,res_path, filename,frequency_range=[0,500]  ):
     plt.show()
     
 
-def bpm_read( num_sample, filename=None,rate=10, show_trace=False ):
+def bpm_read( num_sample, filename=None,rate=10, show_trace=False,frequency_range=[0,500] ):
     '''rate: the data acq rate in unit K'''
     rate = rate*1000.  #10 KHz
     dt =datetime.now()
@@ -309,7 +309,7 @@ def bpm_read( num_sample, filename=None,rate=10, show_trace=False ):
         #plot_posxy(t,posx,posy, save_path, filename )
         #plot_posxy_rms(t,posx,posy,res_path, filename  )
         #plot_fft_posxy(t,posx,posy,res_path, filename  ) 
-        plot_posxy_fft(t,posx,posy,res_path, filename, metadata = metadata  )
+        plot_posxy_fft(t,posx,posy,res_path, filename, metadata = metadata,frequency_range=frequency_range  )
         if show_trace:
             plot_current(t, ca,cb,cc,cd, sumi, res_path, filename, metadata = metadata  )
     else:
