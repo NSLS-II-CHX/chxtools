@@ -261,7 +261,7 @@ def plot_fft_posxy(t,posx,posy,res_path, filename,frequency_range=[0,500]  ):
     plt.show()
     
 
-def bpm_read( num_sample, filename=None,rate=10, show_trace=False,frequency_range=[0,500] ):
+def bpm_read( num_sample, filename=None,rate=10, show_trace=False,frequency_range=[0,500],triger=True):
     '''rate: the data acq rate in unit K'''
     rate = rate*1000.  #10 KHz
     dt =datetime.now()
@@ -281,8 +281,11 @@ def bpm_read( num_sample, filename=None,rate=10, show_trace=False,frequency_rang
  
     if num_sample<13E4:
         caput( pv_num_sam, num_sample)
-        caput( pv_trig, 0 )
-        caput( pv_trig, 1)
+        if triger:
+            caput( pv_trig, 0 )
+            caput( pv_trig, 1)
+        else:
+            caput( pv_trig, 0 )
         ti.sleep(num_sample/rate+3)
 		# need to wait for the acquisition to finish before pulling data from buffer!
         for n, pv in enumerate([pv_ca, pv_cb, pv_cc, pv_cd, pv_px, pv_py, pv_sumi]):
