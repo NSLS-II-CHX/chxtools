@@ -13,7 +13,7 @@ set optimal transmission -> set_T
 by LW 09/25/2017
 """
 import numpy as np
-import xfuncs as xf
+from chxtools import xfuncs as xf
 from epics import *
 
 def att_setup():
