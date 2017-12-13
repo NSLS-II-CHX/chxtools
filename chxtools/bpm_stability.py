@@ -263,7 +263,7 @@ def plot_fft_posxy(t,posx,posy,res_path, filename,frequency_range=[0,500]  ):
 
 def bpm_read( num_sample, filename=None,rate=10, show_trace=False,frequency_range=[0,500],triger=True):
     '''rate: the data acq rate in unit K'''
-    rate = rate*1000.  #10 KHz
+    rate = rate*1000./1.018  #10 KHz
     dt =datetime.now()
     times = '%s%02d%02d-%02d%02d' % (dt.year, dt.month, dt.day,dt.hour,dt.minute)
     
