@@ -25,7 +25,7 @@ from pathlib import Path
 # path to X-ray data files
 # This is a Path object:
 datapath = Path(rs_fn('chxtools', 'X-ray_database'))
-xdatafiles = [f.relative_to(datapath) for f in datapath.glob('*') if (Path(datapath) / Path(f)).is_file()]   
+xdatafiles = [str(f.relative_to(datapath)) for f in datapath.glob('*') if (Path(datapath) / Path(f)).is_file()]   
 default_id = 'CHX_IVU20_05272017'
 
 def get_Lambda(E,u='SI'):
