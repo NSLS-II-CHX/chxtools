@@ -1509,7 +1509,7 @@ def get_ID_calibration(gapstart,gapstop,xray_eye1=xray_eye1, gapstep=.2,gapoff=0
     # create file for writing calibration data:
     fn='id_CHX_IVU20_'+str(time.strftime("%m"))+str(time.strftime("%d"))+str(time.strftime("%Y"))+'.dat'
     # fpath='/home/xf11id/Repos/chxtools/chxtools/X-ray_database/'
-    fpath = rs_fn('chxtools', 'X-ray_database')
+    fpath = rs_fn('chxtools', 'X-ray_database/')
     try:
       outFile = open(fpath+fn, 'w')
       outFile.write('% data from measurements '+str(time.strftime("%D"))+'\n')

@@ -26,7 +26,7 @@ from pkg_resources import resource_filename as rs_fn
 
 # path to X-ray data files
 # datapath='/home/xf11id/Repos/chxtools/chxtools/X-ray_database/'
-datapath = rs_fn('chxtools', 'X-ray_database')
+datapath = rs_fn('chxtools', 'X-ray_database/')
 default_id = 'CHX_IVU20_05272017'
 
 def get_Lambda(E,u='SI'):
