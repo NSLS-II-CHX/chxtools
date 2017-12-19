@@ -4,4 +4,6 @@ h5py
 pandas
 pyepics
 databroker
+ophyd
+scikit-beam
 
