@@ -6,4 +6,5 @@ pyepics
 databroker
 ophyd
 scikit-beam
+fabio
 

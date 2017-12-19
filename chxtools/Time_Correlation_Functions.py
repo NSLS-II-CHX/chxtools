@@ -9,7 +9,7 @@
 import numpy as np
 import sys
 import time
-import skxray.core.roi as roi
+import skbeam.core.roi as roi
 from matplotlib import gridspec
 
 import itertools
