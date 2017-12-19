@@ -1,5 +1,5 @@
-from databroker import db
-from filestore.retrieve import HandlerBase
+from databroker import Broker
+from databroker.assets.handlers_base import HandlerBase
 from chxtools.pims_readers.eiger import EigerImages
 
 EIGER_MD_DICT = {
@@ -64,4 +64,6 @@ class LazyEigerHandler(HandlerBase):
         return FixedEigerImages(master_path, md)
 
 #db.fs.deregister_handler('AD_EIGER')
-db.fs.register_handler('AD_EIGER', LazyEigerHandler)
+db = Broker.named('chx')
+db.reg.register_handler('AD_EIGER', LazyEigerHandler)
+
