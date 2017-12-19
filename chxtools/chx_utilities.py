@@ -1509,16 +1509,15 @@ def get_ID_calibration(gapstart,gapstop,xray_eye1=xray_eye1, gapstep=.2,gapoff=0
     print('using ',xtal,' for ID gap calibration')
     # create file for writing calibration data:
     fn='id_CHX_IVU20_'+str(time.strftime("%m"))+str(time.strftime("%d"))+str(time.strftime("%Y"))+'.dat'
-    # fpath='/home/xf11id/Repos/chxtools/chxtools/X-ray_database/'
     dat_file = Path(rs_fn('chxtools', 'X-ray_database')) / Path(fn)
     try:
-      outFile = open(str(dat_file), 'w')
-      outFile.write('% data from measurements '+str(time.strftime("%D"))+'\n')
-      outFile.write('% K colkumn is a placeholder! \n')
-      outFile.write('% ID gap [mm]     K      E_1 [keV] \n')
-      outFile.close()
-      print('successfully created outputfile: ', str(dat_file))
-    except: raise CHX_utilities_Exception('error: could not create output file')
+        with dat_file.open('w') as outFile:
+            outFile.write('% data from measurements {}\n'.format(time.strftime("%D")))
+            outFile.write('% K column is a placeholder! \n')
+            outFile.write('% ID gap [mm]     K      E_1 [keV] \n')
+            print('successfully created output file: {}'.format(dat_file))
+    except:
+        raise CHX_utilities_Exception('error: could not create output file')
     
     ### do the scanning and data fitting, file writing,....
     center=[]
@@ -1569,7 +1568,7 @@ def get_ID_calibration(gapstart,gapstop,xray_eye1=xray_eye1, gapstep=.2,gapoff=0
         E1.append(xf.get_EBragg(xtal,-coeff[2])/5.0)
         realgap.append(caget('SR:C11-ID:G1{IVU20:1-LEnc}Gap'))
 #   # append data file by i, 1 & xf.get_EBragg(xtal,-coeff[2]/5.0):
-        with open(str(dat_file), "a") as myfile:
+        with dat_file.open('a') as myfile:
             myfile.write(str(caget('SR:C11-ID:G1{IVU20:1-LEnc}Gap'))+'    1.0 '+str(float(xf.get_EBragg(xtal,-coeff[2])/5.0))+'\n')
         print('added data point: ',caget('SR:C11-ID:G1{IVU20:1-LEnc}Gap'),' ',1.0,'     ',str(float(xf.get_EBragg(xtal,-coeff[2])/5.0)))
     except: print('could not evaluate data point for ID gap = ',i,' mm...data point skipped!')
