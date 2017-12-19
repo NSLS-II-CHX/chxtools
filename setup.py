@@ -13,6 +13,6 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     author='Brookhaven National Laboratory',
     packages=find_packages(),
-    package_data={'chxtools/X-ray_database' : ['.dat']},
+    package_data={'chxtools': ['X-ray_database/*.dat']},
     include_package_data=True,
 )

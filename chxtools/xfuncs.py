@@ -17,13 +17,16 @@ version 0.2.1: (this file) changed ID selection for gap function to 'default_id'
 
 import pylab as pl
 import numpy as np
-from os import listdir
-from os.path import isfile, join
 import re
 
+from pkg_resources import resource_filename as rs_fn
+from pathlib import Path
+
 # path to X-ray data files
-datapath='/home/xf11id/Repos/chxtools/chxtools/X-ray_database/'
-default_id='CHX_IVU20_05272017';
+# This is a Path object:
+datapath = Path(rs_fn('chxtools', 'X-ray_database'))
+xdatafiles = [str(f.relative_to(datapath)) for f in datapath.glob('*') if (Path(datapath) / Path(f)).is_file()]   
+default_id = 'CHX_IVU20_05272017'
 
 def get_Lambda(E,u='SI'):
     """
@@ -77,17 +80,16 @@ def get_ac(material,E=8):
     """
     
     #get list_of supported materials from data file directory:
-    xdatafiles = [ f for f in listdir(datapath) if isfile(join(datapath,f)) ]    
     name=[]
-    for i in range(0, np.size(xdatafiles)):
+    for i in range(len(xdatafiles)):
         m=re.search('(?<=n_)\w+', xdatafiles[i])
         if m is not None:
             name.append(m.group(0))             
     
     E=np.array(E)
     if material in name:
-        loadn=datapath+'n_'+material+'.dat'
-        n=pl.loadtxt(loadn,comments='%')
+        loadn = Path(datapath) / Path('n_{}.dat'.format(material))
+        n = pl.loadtxt(loadn, comments='%')
         if np.min(E)>=np.min(n[:,0]/1000) and np.max(E)<=np.max(n[:,0]/1000):
             d=np.interp(E*1000,n[:,0],n[:,1])
             return np.degrees(np.sqrt(2*d))
@@ -105,17 +107,16 @@ def get_n(material,E=8):
     calling sequence: n=get_n(material,E) where n is the complex refractive index detlta-i*beta, E: X-ray energy in keV"
     """
     #get list_of supported materials from data file directory:
-    xdatafiles = [ f for f in listdir(datapath) if isfile(join(datapath,f)) ]    
     name=[]
-    for i in range(0, np.size(xdatafiles)):
+    for i in range(len(xdatafiles)):
         m=re.search('(?<=n_)\w+', xdatafiles[i])
         if m is not None:
             name.append(m.group(0))             
     
     E=np.array(E)
     if material in name:
-        loadn=datapath+'n_'+material+'.dat'
-        n=pl.loadtxt(loadn,comments='%')
+        loadn = Path(datapath) / Path('n_{}.dat'.format(material))
+        n = pl.loadtxt(loadn, comments='%')
         if np.min(E)>=np.min(n[:,0]/1000) and np.max(E)<=np.max(n[:,0]/1000):
             d=np.interp(E*1000,n[:,0],n[:,1])
             b=np.interp(E*1000,n[:,0],n[:,2])
@@ -135,17 +136,16 @@ def get_mu(material,E=8):
     calling sequence: mu=get_mu(material,E) where mu [MICRONS!!!] is the 1/e attenuation length, E: X-ray energy in keV'
     """
     #get list_of supported materials from data file directory:
-    xdatafiles = [ f for f in listdir(datapath) if isfile(join(datapath,f)) ]    
     name=[]
-    for i in range(0, np.size(xdatafiles)):
+    for i in range(len(xdatafiles)):
         mm=re.search('(?<=mu_)\w+', xdatafiles[i])
         if mm is not None:
             name.append(mm.group(0))             
     
     E=np.array(E)
     if material in name:
-        loadn=datapath+'mu_'+material+'.dat'
-        m=pl.loadtxt(loadn,comments='%')
+        loadn = Path(datapath) / Path('mu_{}.dat'.format(material))
+        m = pl.loadtxt(loadn, comments='%')
         if np.min(E)>=np.min(m[:,0]/1000) and np.max(E)<=np.max(m[:,0]/1000):
             mu=np.interp(E*1000,m[:,0],m[:,1])
             return mu
@@ -167,9 +167,8 @@ def get_T(material,E=8,l=1):
     either E or l can be vectors; type get_T(\"material?\") for a list of supported materials
     """
     #get list_of supported materials from data file directory:
-    xdatafiles = [ f for f in listdir(datapath) if isfile(join(datapath,f)) ]    
     name=[]
-    for i in range(0, np.size(xdatafiles)):
+    for i in range(len(xdatafiles)):
         m=re.search('(?<=n_)\w+', xdatafiles[i])
         if m is not None:
             name.append(m.group(0))             
@@ -179,8 +178,8 @@ def get_T(material,E=8,l=1):
     #if len(E)==1 or len(l)==1:
     if E.size==1 or l.size==1:
         if material in name:
-            loadn=datapath+'n_'+material+'.dat'
-            n=pl.loadtxt(loadn,comments='%')
+            loadn = Path(datapath) / Path('n_{}.dat'.format(material))
+            n = pl.loadtxt(loadn, comments='%')
             if np.min(E)>=np.min(n[:,0]/1000) and np.max(E)<=np.max(n[:,0]/1000):
                 b=np.interp(E*1000,n[:,0],n[:,2])
                 mu=4*np.pi/get_Lambda(E,'um')*b;
@@ -366,22 +365,21 @@ def get_gap(E,harmonic=3,ID=default_id):
     E can be an array of energies. Type get_gap\"ID?\") for a list of available magnetic datasets.
     """
     #get list_of available magnetic measurements from data file directory:
-    xdatafiles = [ f for f in listdir(datapath) if isfile(join(datapath,f)) ]    
     name=[]
-    for i in range(0, np.size(xdatafiles)):
+    for i in range(len(xdatafiles)):
         m=re.search('(?<=id_)\w+', xdatafiles[i])
         if m is not None:
             name.append(m.group(0))             
 
     if E=='ID?':
-        print ('list of available magnetic measurements (based on data files in directory '+datapath+':')
+        print ('list of available magnetic measurements (based on data files in directory {}:'.format(str(datapath)))
         print (name)
     else:
         E=np.array(E)*1.0
         harm_check(harmonic)     
         if ID in name:
-            loadn=datapath+'id_'+ID+'.dat'
-            magdat=pl.loadtxt(loadn,comments='%')
+            loadn = Path(datapath) / Path('id_{}.dat'.format(ID))
+            magdat = pl.loadtxt(loadn, comments='%')
             #harmonic=harmonic*1.0
             if np.min(E/harmonic)>=np.min(magdat[:,2]) and np.max(E/harmonic)<=np.max(magdat[:,2]):
                 gap=np.interp(E/harmonic,magdat[:,2],magdat[:,0])
@@ -400,9 +398,8 @@ def get_Es(gap,harmonic=[1,2,3,4,5],ID=default_id):
     harmonic can be a list of integers. Type get_Es(\"ID?\") for a list of available magnetic datasets
     """
     #get list_of available magnetic measurements from data file directory:
-    xdatafiles = [ f for f in listdir(datapath) if isfile(join(datapath,f)) ]    
     name=[]
-    for i in range(0, np.size(xdatafiles)):
+    for i in range(len(xdatafiles)):
         m=re.search('(?<=id_)\w+', xdatafiles[i])
         if m is not None:
             name.append(m.group(0))             
@@ -415,8 +412,8 @@ def get_Es(gap,harmonic=[1,2,3,4,5],ID=default_id):
             if l==np.size(harmonic)-1:
                     gap=np.array(gap)
                     if ID in name:
-                        loadn=datapath+'id_'+ID+'.dat'
-                        magdat=pl.loadtxt(loadn,comments='%')
+                        loadn = Path(datapath) / Path('id_{}.dat'.format(ID))
+                        magdat = pl.loadtxt(loadn, comments='%')
                         harmonic=np.array(harmonic)*1.0
                         if np.min(gap)>=np.min(magdat[:,0]) and np.max(gap)<=np.max(magdat[:,0]):
                             Es=np.interp(gap,magdat[:,0],magdat[:,2])
