@@ -252,7 +252,8 @@ def get_EBragg(reflection,theta_Bragg=12.0, d_spacing=None):
                      ds.append(dspace[ind])
                      I.append(Irel[ind])
              else:
-                 ds = [d_spacing] * len(theta_Bragg)
+                 #ds = [d_spacing] * len(theta_Bragg) #will raise error if theta_Bragg is a scalar
+                 ds = [d_spacing] * np.size(theta_Bragg)
              dspace=np.array(ds)
              lam=2*dspace*np.sin(theta_Bragg/180*np.pi)
              EthetaB=hPlank*cvac/(lam*Qelectron)*1e7
