@@ -1578,7 +1578,7 @@ def get_ID_calibration(gapstart,gapstop,xray_eye1=xray_eye1, gapstep=.2,gapoff=0
     plt.plot(E1,gaps,'ro-')
     plt.xlabel('E_1 [keV]')
     plt.ylabel('ID gap [mm]')
-    plt.title('ID gap calibration in file: '+str(dat_file),size=12)
+    plt.title('ID gap calibration in file: {}'.format(dat_file), size=12)
     plt.grid()
     
     
