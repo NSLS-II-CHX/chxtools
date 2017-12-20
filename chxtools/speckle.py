@@ -10,8 +10,8 @@ import six
 import numpy as np
 import time
 
-from skxray.core import roi
-from skxray.core.utils import bin_edges_to_centers, geometric_series
+from skbeam.core import roi
+from skbeam.core.utils import bin_edges_to_centers, geometric_series
 
 import logging
 logger = logging.getLogger(__name__)

@@ -1,0 +1,15 @@
+atom
+cython
+databroker
+enaml
+fabio
+h5py
+matplotlib
+numpy
+ophyd
+pandas
+pims
+pyepics
+scikit-beam
+scipy
+

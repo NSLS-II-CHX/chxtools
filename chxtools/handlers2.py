@@ -1,7 +1,8 @@
 import numpy as np
 import h5py
 from pims import FramesSequence, Frame
-from databroker import db
+from databroker import Broker
+from .handlers import LazyEigerHandler
 
 
 class EigerImages2(FramesSequence):
@@ -96,8 +97,11 @@ class EigerHandler2:
         # TODO Return a multi-dimensional PIMS seq.
         return EigerImages2(master_path, self._images_per_file, md=md)
 
-db.fs.deregister_handler('AD_EIGER')
-db.fs.deregister_handler('AD_EIGER2')
+db = Broker.named('chx')
 
-db.fs.register_handler('AD_EIGER2', EigerHandler2)
-db.fs.register_handler('AD_EIGER', LazyEigerHandler)
+db.reg.deregister_handler('AD_EIGER')
+db.reg.deregister_handler('AD_EIGER2')
+
+db.reg.register_handler('AD_EIGER2', EigerHandler2)
+db.reg.register_handler('AD_EIGER', LazyEigerHandler)
+
