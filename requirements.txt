@@ -6,7 +6,6 @@ fabio
 h5py
 matplotlib
 numpy
-ophyd
 pandas
 pims
 pyepics
