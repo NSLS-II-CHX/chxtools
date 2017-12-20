@@ -1,4 +1,5 @@
 atom
+cython
 databroker
 enaml
 fabio
@@ -10,4 +11,5 @@ pandas
 pims
 pyepics
 scikit-beam
+scipy
 
