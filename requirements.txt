@@ -7,4 +7,5 @@ databroker
 ophyd
 scikit-beam
 fabio
+pims
 
