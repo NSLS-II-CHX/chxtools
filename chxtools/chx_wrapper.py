@@ -61,7 +61,7 @@ def cw_ascan(mot,xmin,xmax,npoints,acqt='default',pos_ret=True):
     ascan(mot,xmin,xmax,npoints)
 
     # put beamline back into initial state
-    if pos_ret is True:
+    if pos_ret:
         caput(mot.record+'.VAL',ini_motpos)
         print('returned axes to: {}'.format(ini_motpos))
     if acqt != 'default':
