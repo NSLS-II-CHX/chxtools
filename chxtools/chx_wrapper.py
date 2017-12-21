@@ -248,7 +248,7 @@ def cw_CCDseries(folder,filename,detector,imnum='default',startn=1,acqt='default
         except:
             print('could not reset image numbers to {}'.format(ini_imnum))
     time.sleep(.5)
-    try: 
+    try:
         caput(acq_pv.split('}')[0]+'}cam1:Acquire', ini_acq)      # restart camera if it was running before taking the series
         print('restarted camera')
     except:

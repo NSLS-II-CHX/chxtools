@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 import sys
 
 def xsvs(image_sets, label_array, number_of_img, timebin_num=2, time_bin=None,
-         max_cts=None, bad_images = None, threshold=None):   
+         max_cts=None, bad_images = None, threshold=None):
     """
     This function will provide the probability density of detecting photons
     for different integration times.
@@ -43,14 +43,14 @@ def xsvs(image_sets, label_array, number_of_img, timebin_num=2, time_bin=None,
        the brightest pixel in any ROI in any image in the image set.
        defaults to using skxray.core.roi.roi_max_counts to determine
        the brightest pixel in any of the ROIs
-       
-       
+
+
     bad_images: array, optional
         the bad images number list, the XSVS will not analyze the binning image groups which involve any bad images
     threshold: float, optional
         If one image involves a pixel with intensity above threshold, such image will be considered as a bad image.
-    
-    
+
+
     Returns
     -------
     prob_k_all : array
@@ -111,9 +111,9 @@ def xsvs(image_sets, label_array, number_of_img, timebin_num=2, time_bin=None,
         # Ring buffer, a buffer with periodic boundary conditions.
         # Images must be keep for up to maximum delay in buf.
         #buf = np.zeros([num_times, timebin_num], dtype=np.object)  # matrix of buffers
-        
-        buf =  np.ma.zeros([num_times, timebin_num, nopixels]) 
-        buf.mask = True   
+
+        buf =  np.ma.zeros([num_times, timebin_num, nopixels])
+        buf.mask = True
 
         # to track processing each time level
         track_level = np.zeros( num_times )
@@ -126,45 +126,45 @@ def xsvs(image_sets, label_array, number_of_img, timebin_num=2, time_bin=None,
 
         prob_k = np.zeros_like(prob_k_all)
         prob_k_pow = np.zeros_like(prob_k_all)
- 
+
         try:
             noframes= len(images)
         except:
             noframes= images.length
-            
-        
+
+
         #Num= { key: [0]* len(  dict_dly[key] ) for key in list(dict_dly.keys())  }
-        
+
         for n, img in enumerate(images):
             cur[0] = 1 + cur[0]% timebin_num
             # read each frame
             # Put the image into the ring buffer.
-            
-            img_ = (np.ravel(img))[indices]   
-        
+
+            img_ = (np.ravel(img))[indices]
+
             if threshold is not None:
                 if img_.max() >= threshold:
                     print ('bad image: %s here!'%n  )
                     img_ =  np.ma.zeros( len(img_) )
-                    img_.mask = True    
-                
-            if bad_images is not None:        
+                    img_.mask = True
+
+            if bad_images is not None:
                 if n in bad_images:
                     print ('bad image: %s here!'%n)
                     img_ =  np.ma.zeros( len(img_) )
-                    img_.mask = True         
-        
+                    img_.mask = True
+
             buf[0, cur[0] - 1] = img_
 
             _process(num_roi, 0, cur[0] - 1, buf, img_per_level, labels,
                      max_cts, bin_edges[0], prob_k, prob_k_pow,track_bad_level)
-            
+
             #print (0, img_per_level)
 
             # check whether the number of levels is one, otherwise
             # continue processing the next level
             level = 1
-            processing=1   
+            processing=1
             #print ('track_level: %s'%track_level)
             #while level < num_times:
                 #if not track_level[level]:
@@ -173,20 +173,20 @@ def xsvs(image_sets, label_array, number_of_img, timebin_num=2, time_bin=None,
                 if track_level[level]:
                     prev = 1 + (cur[level - 1] - 2) % timebin_num
                     cur[level] = 1 + cur[level] % timebin_num
-                    
+
                     bufa = buf[level-1,prev-1]
-                    bufb=  buf[level-1,cur[level-1]-1] 
-                
+                    bufb=  buf[level-1,cur[level-1]-1]
+
                     if (bufa.data==0).all():
                         buf[level,cur[level]-1] =  bufa
                     elif (bufb.data==0).all():
-                        buf[level,cur[level]-1] = bufb 
+                        buf[level,cur[level]-1] = bufb
                     else:
                         buf[level, cur[level]-1] =  bufa + bufb
-                    
+
                     #print (level, cur[level]-1)
-                    
-                    
+
+
                     track_level[level] = 0
 
                     _process(num_roi, level, cur[level]-1, buf, img_per_level,
@@ -195,40 +195,40 @@ def xsvs(image_sets, label_array, number_of_img, timebin_num=2, time_bin=None,
                     level += 1
                     if level < num_times:processing = 1
                     else:processing = 0
-                    
+
                 else:
                     track_level[level] = 1
                     processing = 0
                 #print ('track_level: %s'%track_level)
-            
+
             if  noframes>=10 and n %( int(noframes/10) ) ==0:
                 sys.stdout.write("#")
-                sys.stdout.flush() 
-            
+                sys.stdout.flush()
+
 
             prob_k_all += (prob_k - prob_k_all)/(i + 1)
             prob_k_pow_all += (prob_k_pow - prob_k_pow_all)/(i + 1)
 
     prob_k_std_dev = np.power((prob_k_pow_all -
                                np.power(prob_k_all, 2)), .5)
-    
- 
+
+
     for i in range(num_times):
         if   isinstance(prob_k_all[i,0], float ):
             for j in range( len(u_labels)):
                 prob_k_all[i,j] = np.array(  [0] * (len(bin_edges[i]) -1 ) )
                 prob_k_std_dev[i,j] = np.array(  [0] * (len(bin_edges[i]) -1 ) )
-        
-        
+
+
     logger.info("Processing time for XSVS took %s seconds."
                 "", (time.time() - start_time))
     elapsed_time = time.time() - start_time
     #print (Num)
-    print ('Total time: %.2f min' %(elapsed_time/60.)) 
-    
+    print ('Total time: %.2f min' %(elapsed_time/60.))
+
     #print (img_per_level - track_bad_level)
     #print (buf)
-    
+
     return prob_k_all, prob_k_std_dev
 
 
@@ -264,15 +264,15 @@ def _process(num_roi, level, buf_no, buf, img_per_level, labels,
     """
     img_per_level[level] += 1
     data = buf[level, buf_no]
-    if ( data.data ==0).all():  
-        track_bad_level[level] += 1   
- 
+    if ( data.data ==0).all():
+        track_bad_level[level] += 1
+
     #print (img_per_level,track_bad_level)
-    
+
     u_labels = list(np.unique(labels))
-    
+
     if not (data.data  ==0).all():
-        for j, label in enumerate(u_labels):        
+        for j, label in enumerate(u_labels):
             roi_data = data[labels == label]
             spe_hist, bin_edges = np.histogram(roi_data, bins=bin_edges,
                                            density=True)
@@ -344,10 +344,10 @@ def get_bin_edges(num_times, num_rois, mean_roi, max_cts):
     """
     norm_bin_edges = np.zeros((num_times, num_rois), dtype=object)
     norm_bin_centers = np.zeros_like(norm_bin_edges)
-    
+
     bin_edges = np.zeros((num_times, num_rois), dtype=object)
-    bin_centers = np.zeros_like(bin_edges)    
-    
+    bin_centers = np.zeros_like(bin_edges)
+
     for i in range(num_times):
         for j in range(num_rois):
             bin_edges[i, j] = np.arange(max_cts*2**i)
@@ -378,7 +378,7 @@ def gammaDist(x,params):
     In case of high intensity, the beam behavors like wave and
     the probability density of photon, P(x), satify this gamma function.
     '''
-    
+
     K,M = params
     K = float(K)
     M = float(M)
@@ -416,7 +416,7 @@ def gamma_dist(bin_values, K, M):
     gamma_dist = coeff*np.exp(-M*x/K)
     return gamma_dist
 
- 
+
 
 
 def nbinom_dist(bin_values, K, M):
@@ -453,19 +453,19 @@ def nbinom_dist(bin_values, K, M):
                     gammaln(bin_values + 1) - gammaln(M))
 
     nbinom = co_eff * np.power(M / (K + M), M) * np.power(K / (M + K), bin_values)
-    
+
     return nbinom
 
 
 
 #########poisson
-def poisson(x,K):    
+def poisson(x,K):
     '''Poisson distribution function.
-    K is  average photon counts    
+    K is  average photon counts
     In case of low intensity, the beam behavors like particle and
     the probability density of photon, P(x), satify this poisson function.
     '''
-    K = float(K)    
+    K = float(K)
     Pk = np.exp(-K)*power(K,x)/gamma(x+1)
     return Pk
 
@@ -542,12 +542,7 @@ def diff_mot_con_factor(times, relaxation_rate,
 def get_roi(data, threshold=1e-3):
     roi = np.where(data>threshold)
     if len(roi[0]) > len(data)-3:
-        roi = (np.array(roi[0][:-3]),)                    
+        roi = (np.array(roi[0][:-3]),)
     elif len(roi[0]) < 3:
         roi = np.where(data>=0)
     return roi[0]
-
-
-
-
-

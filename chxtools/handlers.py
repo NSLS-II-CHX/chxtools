@@ -66,4 +66,3 @@ class LazyEigerHandler(HandlerBase):
 #db.fs.deregister_handler('AD_EIGER')
 db = Broker.named('chx')
 db.reg.register_handler('AD_EIGER', LazyEigerHandler)
-
