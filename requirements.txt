@@ -11,5 +11,6 @@ pims
 pyepics
 pymongo
 scikit-beam
+scikit-image
 scipy
 
