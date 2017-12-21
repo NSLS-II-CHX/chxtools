@@ -1,0 +1,16 @@
+atom
+cython
+databroker
+enaml
+fabio
+h5py
+matplotlib
+numpy
+pandas
+pims
+pyepics
+pymongo
+pyqt5
+scikit-beam
+scikit-image
+scipy
