@@ -99,9 +99,5 @@ class EigerHandler2:
 
 db = Broker.named('chx')
 
-db.reg.deregister_handler('AD_EIGER')
-db.reg.deregister_handler('AD_EIGER2')
-
-db.reg.register_handler('AD_EIGER2', EigerHandler2)
-db.reg.register_handler('AD_EIGER', LazyEigerHandler)
-
+db.reg.register_handler('AD_EIGER', LazyEigerHandler, overwrite=True)
+db.reg.register_handler('AD_EIGER2', EigerHandler2, overwrite=True)

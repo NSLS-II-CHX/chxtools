@@ -61,7 +61,7 @@ def cw_ascan(mot,xmin,xmax,npoints,acqt='default',pos_ret=True):
     ascan(mot,xmin,xmax,npoints)
 
     # put beamline back into initial state
-    if pos_ret is True:
+    if pos_ret:
         caput(mot.record+'.VAL',ini_motpos)
         print('returned axes to: {}'.format(ini_motpos))
     if acqt != 'default':
@@ -248,7 +248,7 @@ def cw_CCDseries(folder,filename,detector,imnum='default',startn=1,acqt='default
         except:
             print('could not reset image numbers to {}'.format(ini_imnum))
     time.sleep(.5)
-    try: 
+    try:
         caput(acq_pv.split('}')[0]+'}cam1:Acquire', ini_acq)      # restart camera if it was running before taking the series
         print('restarted camera')
     except:
