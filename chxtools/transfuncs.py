@@ -29,7 +29,7 @@ def trans_setup():
     return {'lens_material':lens_mat,'lens_number':lens_N,'lens_radius':lens_R,'trans_position':trans_pos}
 
 
-def calc_transsetup(image_pos,E='auto',silent=False):  
+def calc_transsetup(image_pos,E='auto',silent=False):
     """
     calc_transsetup(image_pos,E='auto'): funtion to calculate CHX transfocator settings
     required arument:
@@ -38,16 +38,16 @@ def calc_transsetup(image_pos,E='auto',silent=False):
     E='auto': get beamline energy from PV (currently: DCM) | E=7894: manual overwrite of energy parameter
     silent='False': silence the output (e.g. to use function in a loop): False/True
     Note: 'virtual images' are discarded in the search
-    Note: search is implemented to go through the lens stacks with large numbers of lenses first 
+    Note: search is implemented to go through the lens stacks with large numbers of lenses first
     -> returned solution will be e.g. using lens stack #5 with 5 lenses, instead of #1 (1) and #3 (4)
     function returns dictionary of the form: {'lens_config':bin_index,'z_position':zmin}
     dependencies: imports numpy, fminbound (scipy.optimze) and xfuncs
     calls trans_setup() to get physical configuration of transfocator system
     by LW 03/14/2016
-    """      
-    image_pos=np.array(image_pos) 
+    """
+    image_pos=np.array(image_pos)
     if E is 'auto':
-       #E=8000   # temporary: don't have channel access -> set E to 8000eV   
+       #E=8000   # temporary: don't have channel access -> set E to 8000eV
        E=caget('XF:11IDA-OP{Mono:DCM-Ax:Energy}Mtr.RBV')     ### get energy automatically with channel access
        print ("getting energy from global PV: E=",E,'eV')
        #(currently not implemented in test version (no channel access) -> 8000eV default)'   # future: add PV name for house keeping
@@ -55,7 +55,7 @@ def calc_transsetup(image_pos,E='auto',silent=False):
            raise transfuncs_Exception("error: Input argument E has to be 2000<E<30000 [eV]")
     E=np.array(E)*1.
 
-            
+
    # transfocator setup
     trans_conf=trans_setup()
     lens_R = np.array(trans_conf['lens_radius'])*1.
@@ -63,10 +63,10 @@ def calc_transsetup(image_pos,E='auto',silent=False):
     lens_N = np.array(trans_conf['lens_number'])
     lens_mat = np.array(trans_conf['lens_material'])
 
-  
+
    # calculate all available focal lengths:
     f=str('{:0'+str(len(lens_R))+'b}')
-    delta=np.zeros(len(lens_R))  
+    delta=np.zeros(len(lens_R))
     for w in range(0, len(lens_R)):
         delta[w]=np.real(xf.get_n(lens_mat[w],E/1000.))
     F=np.zeros(2**len(lens_R))
@@ -81,25 +81,25 @@ def calc_transsetup(image_pos,E='auto',silent=False):
             a[h]=int(k[h])
         ln=lens_N*a
         F[l]=1/np.sum(2*delta*ln/(lens_R*1E-3))
-        #print F[l]    
+        #print F[l]
         def image_func(x):
             return abs(x - image_pos + 1/(-1/x + 1/F[l]))
-       
+
         zmin[l] = fminbound(image_func, zpos[0], zpos[1])
         q[l] = 1/(-1/zmin[l]+1/F[l])
         if q[l]<0:
             real_im[l]=0
             q[l]=float('NaN')
-        impos_diff[l] = q[l]+zmin[l]-image_pos    
-    
+        impos_diff[l] = q[l]+zmin[l]-image_pos
+
     # looking for the best option
     index=np.nanargmin(abs(impos_diff))
     bi=f.format(index)
     bin_index=np.zeros(len(lens_R))
     for g in range(0, len(lens_R)):
-            bin_index[g]=int(bi[g])       
+            bin_index[g]=int(bi[g])
     F= F[index]
-    zmin = zmin[index]    
+    zmin = zmin[index]
     q = q[index]
     impos_diff = impos_diff[index]
     if impos_diff <= 0: loc='upstream'
@@ -113,12 +113,12 @@ def calc_transsetup(image_pos,E='auto',silent=False):
         print ('requested image position: '+str(image_pos)+' [m from source]   best match: '+str(image_pos+impos_diff)+' [m from source]')
         print ('difference in image location: '+str(impos_diff)+' [m], image '+loc+' of requested position')
         print ('requested demagnification: 1/'+str(zpos.mean()/(image_pos-zpos.mean()))+'  actual demagnification: 1/'+str(zmin/(image_pos-zmin)))
-        print ('optimized  transfocator position: '+str(zmin)+' [m from source],   relative position: '+str(zmin-zpos.mean())+'[m]')       
+        print ('optimized  transfocator position: '+str(zmin)+' [m from source],   relative position: '+str(zmin-zpos.mean())+'[m]')
         print (' # slot7  slot6  slot5  slot4  slot3 slot2 slot1   <------ beam direction (slot 8 is currently B-fiber only)')
         print ('    '+str(conf_lensR[6])+'    '+str(conf_lensR[5])+'    '+str(conf_lensR[4])+'    '+str(conf_lensR[3])+'    '+str(conf_lensR[2])+'   '+str(conf_lensR[1])+'   '+str(conf_lensR[0])+'       lens radius [mm]')
         print ('    '+str(conf_lensN[6])+'    '+str(conf_lensN[5])+'    '+str(conf_lensN[4])+'    '+str(conf_lensN[3])+'    '+str(conf_lensN[2])+'   '+str(conf_lensN[1])+'   '+str(conf_lensN[0])+'       number of lenses')
         print (' ' )
-    return {'lens_config':bin_index,'z_position':zmin}        
+    return {'lens_config':bin_index,'z_position':zmin}
 
 def get_ip(conf,rel_z_pos,E='auto'):
     """
@@ -141,8 +141,8 @@ def get_ip(conf,rel_z_pos,E='auto'):
     lens_R = np.array(trans_conf['lens_radius'])*1.
     zpos = np.array(trans_conf['trans_position'])*1.
     lens_N = np.array(trans_conf['lens_number'])
-    lens_mat = np.array(trans_conf['lens_material'])     
-   
+    lens_mat = np.array(trans_conf['lens_material'])
+
    # checks:
     conf=np.array(conf)
     #print conf.min<0
@@ -151,19 +151,19 @@ def get_ip(conf,rel_z_pos,E='auto'):
     if len(conf) != len(lens_R):
         print ('thats interesting')
     if E is 'auto':
-      #E=8000   # temporary: don't have channel access -> set E to 8000eV   
+      #E=8000   # temporary: don't have channel access -> set E to 8000eV
       E=caget('XF:11IDA-OP{Mono:DCM-Ax:Energy}Mtr.RBV')     ### get energy automatically with channel access
       print ('getting energy from global PV: E=',E,'eV')# (currently not implemented in test version (no channel access) -> 8000eV default)'   # future: add PV name for house keeping
       if E> 30000 or E< 2000:
           raise transfuncs_Exception("error: Input argument E has to be 2000<E<30000 [eV]")
     E=np.array(E)*1.
-    if conf.min()<0 or conf.max()>1 or len(conf) != len(lens_R): 
+    if conf.min()<0 or conf.max()>1 or len(conf) != len(lens_R):
         raise transfuncs_Exception("error: Input argument conf has to be an array or list of the form [1,0,1,...] and its lenght has to match the number of slots occupied by lenses")
     if rel_z_pos>zpos.max()-zpos.mean() or rel_z_pos<zpos.min()-zpos.mean():
-        raise transfuncs_Exception("error: relative transfocator position has to be ["+str(zpos.min()-zpos.mean())+":"+str(zpos.max()-zpos.mean())+"] m") 
-    
+        raise transfuncs_Exception("error: relative transfocator position has to be ["+str(zpos.min()-zpos.mean())+":"+str(zpos.max()-zpos.mean())+"] m")
+
     # calculate focusing:
-    delta=np.zeros(len(lens_R))  
+    delta=np.zeros(len(lens_R))
     for w in range(0, len(lens_R)):
         delta[w]=np.real(xf.get_n(lens_mat[w],E/1000.))
     ln=lens_N*conf
@@ -177,7 +177,7 @@ def get_ip(conf,rel_z_pos,E='auto'):
         print ('image is imaginary...'+'(@'+str(imp)+' [m from source])')
     else: print ('image position: '+str(imp)+' [m from source]')
     return imp
-    
+
 
 class transfuncs_Exception(Exception):
     pass

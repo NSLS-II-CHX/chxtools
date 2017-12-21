@@ -25,7 +25,7 @@ def E_calibration(file,Edge='Cu',xtal='Si111cryo',B_off=0):
     B_off (optional): apply offset to Bragg angle data
     currently there is no check on input parameters!
     """
-    # read the data file 
+    # read the data file
     import csv
     import numpy as np
     import matplotlib.pyplot as plt
@@ -106,7 +106,7 @@ def E_calibration(file,Edge='Cu',xtal='Si111cryo',B_off=0):
     edge_index=np.argmax(diffdat)
     B_edge=xf.get_Bragg(xtal,Edge_data[Edge])[0]
 
-    print('') 
+    print('')
     print('Energy calibration for: ',file_path)
     print('Edge used for calibration: ',Edge)
     print('Crystal used for calibration: ',xtal)
@@ -136,7 +136,7 @@ def dcm_roll(Bragg,offset,distance,offmode='mm',pixsize=5.0):
     elif offmode=='pixel':
         offset=np.array(offset)*pixsize/1000.0
     else: raise CHX_utilities_Exception('Eror: offmode must be either "mm" or "pixel"')
-    if distance=='dcm_bpm':    
+    if distance=='dcm_bpm':
         d=3000.0 # distance dcm-bpm in mm
     elif distance=='dcm_mbs':
         d=2697.6 #distance dcm-mbs in mm
@@ -146,7 +146,7 @@ def dcm_roll(Bragg,offset,distance,offmode='mm',pixsize=5.0):
         try:
             d=float(distance)
         except:
-            raise CHX_utilities_Exception('Eror: distance must be a recognized string or numerical value')    
+            raise CHX_utilities_Exception('Eror: distance must be a recognized string or numerical value')
 
     # data fitting
     fitfunc = lambda p, x: p[0]+2*d*p[1]*np.sin(x/180.*np.pi) # Target function
@@ -167,7 +167,7 @@ def dcm_roll(Bragg,offset,distance,offmode='mm',pixsize=5.0):
     print('\Delta \Phi= ',p1[1]*180.0/np.pi,'deg')
 
 def sum_image(filename, firstim=0, lastim=9999):
-    """ 
+    """
     by LW 03/30/2015
     function to sum up tiff files and display cuts
     calling sequence: sum_image(filename, firstim=0, lastim=9999)
@@ -231,7 +231,7 @@ def sum_image(filename, firstim=0, lastim=9999):
             #imgplot= plt.imshow(image_data/(imcount-firstim+1),origin='lower')
             #imgplot.set_cmap('gray')
             time.sleep(5)
-            try: 
+            try:
                 im = Image.open(file_to_open)
                 #im.show()
             except:get_out=1
@@ -257,7 +257,7 @@ def sum_image(filename, firstim=0, lastim=9999):
     imgplot= plt.imshow(image_data/(imcount-firstim+1),origin='lower')
     imgplot.set_cmap('gray')
     plt.title('summed :'+fp+fn+fnum+'-'+ic)
-    #finalimage.show()    
+    #finalimage.show()
     return image_data/(imcount-firstim+1)
 
 def gauss(x,*p):
@@ -344,7 +344,7 @@ def show_img(img, ax=None,save=False, vmin=None, vmax=None,cmap='spectral',fonts
     """show a two-D image"""
     import matplotlib.pyplot as plt
     from matplotlib import cm
-    import numpy as np  
+    import numpy as np
 
     if ax is None:fig, ax = plt.subplots(nrows=1)
     if vmin==None:vmin=img.min()
@@ -444,7 +444,7 @@ def plot_pv_values( dict_tv, time, keys=None,title=None, xlabel='Time', ylim_tv=
     import matplotlib.dates as md
     #from numpy import arange,array
     import numpy as np
-    import datetime 
+    import datetime
     import matplotlib.pyplot as plt
 
     if keys is None:
@@ -527,7 +527,7 @@ def plot_pv_values( dict_tv, time, keys=None,title=None, xlabel='Time', ylim_tv=
     axs[n].set_xlabel(xlabel,fontsize=24)
     axs[n].set_xticklabels([x.strftime('%m-%d %H:%M') for x in xticks],fontsize=24)
 
-    axs[n].set_ylabel( ki ,fontsize=24) 
+    axs[n].set_ylabel( ki ,fontsize=24)
 
     #axs[0].set_xlim( np.min(time), np.max(time) )
 
@@ -600,7 +600,7 @@ def get_archive_pvlist_values(PVs, labels, start_time, end_time,
         scan_archives=True
         dict_tv[label]=get_archive_pv_value(PV, label, start_time, end_time,
         scan_archives=scan_archives, limit=limit,
-                interpolation=interpolation,archiver=[archiver,archiver_acc] )  
+                interpolation=interpolation,archiver=[archiver,archiver_acc] )
 
     return dict_tv
 
@@ -611,7 +611,7 @@ def get_archive_pv_value(PV, label, start_time, end_time,scan_archives=True,
     '''get PV, PV-Label from archiver from start_time to end_time
 
     Return:
-       pandas.DataFrame with keys as time-str, time-float, label-values 
+       pandas.DataFrame with keys as time-str, time-float, label-values
     '''
 
     import pandas as pd
@@ -648,9 +648,9 @@ def get_archive_pv_value(PV, label, start_time, end_time,scan_archives=True,
 def read_scan( sid,fill=True ):
     ''' read data from sid = scan_id'''
 
-    from dataportal import (DataBroker as db, 
+    from dataportal import (DataBroker as db,
                         StepScan as ss,
-                        StepScan, DataBroker, 
+                        StepScan, DataBroker,
                         DataMuxer as dm)
     import datetime
 
@@ -686,7 +686,7 @@ def get_waterfall( data,direction='horz', cuts=[1,2,3],firstim=0,
 
     import numpy as np
 
-    imcount=firstim 
+    imcount=firstim
     #im_time=[]
     waterfall={}
     notime = lastim +1-firstim
@@ -703,7 +703,7 @@ def get_waterfall( data,direction='horz', cuts=[1,2,3],firstim=0,
             if direction=='horz':
                 cdat=dat[i,:];
             elif direction=='vert':
-                cdat=dat[:,i]; 
+                cdat=dat[:,i];
         waterfall[i].append( cdat )
     for i in cuts:waterfall[i]=np.array(waterfall[i])
 
@@ -715,7 +715,7 @@ def get_img_waterfall( imgs,direction='horz', cuts=[1,2,3],firstim=0, lastim=1,
 
     import numpy as np
 
-    imcount=firstim 
+    imcount=firstim
     #im_time=[]
     waterfall={}
     notime = lastim +1-firstim
@@ -732,7 +732,7 @@ def get_img_waterfall( imgs,direction='horz', cuts=[1,2,3],firstim=0, lastim=1,
             if direction=='horz':
                 cdat=dat[i,:];
             elif direction=='vert':
-                cdat=dat[:,i]; 
+                cdat=dat[:,i];
         waterfall[i].append( cdat )
     for i in cuts:waterfall[i]=np.array(waterfall[i])
 
@@ -816,7 +816,7 @@ def line_focus(filename,imgs=None,times=None, direction='horz',
                 #imgplot= plt.imshow(image_data/(imcount-firstim+1),origin='lower')
                 #imgplot.set_cmap('gray')
                 time.sleep(5)
-                try: 
+                try:
                     im = Image.open(file_to_open);
                     (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(file_to_open)
                     im_time.append(time.ctime(mtime))
@@ -859,7 +859,7 @@ def line_focus(filename,imgs=None,times=None, direction='horz',
             imcount=imcount+1
 
     if filename=='im':
-        imcount=firstim 
+        imcount=firstim
         im_time = times
         baseline=[]
         amp=[]
@@ -900,7 +900,7 @@ def line_focus(filename,imgs=None,times=None, direction='horz',
                 width.append(coeff[3])
 
     if filename=='wt':
-        imcount=firstim 
+        imcount=firstim
         im_time = times
         baseline=[]
         amp=[]
@@ -930,7 +930,7 @@ def line_focus(filename,imgs=None,times=None, direction='horz',
                 try:
                     coeff,var_matrix = curve_fit(gauss,
                                     np.array( xrange(  len(cdat)  )),cdat,p0=p0);
-                except: coeff=[0,0,0,0] 
+                except: coeff=[0,0,0,0]
                 baseline.append(coeff[0])
                 amp.append(coeff[1])
                 center.append(coeff[2])
@@ -1012,11 +1012,11 @@ def get_fft( t,y ):
     idx = np.argmax(np.abs(FFT))
     freq = freqs[idx]
     freq_in_hertz = abs(freq ) #* dx)
-    print('The maximum frequency is:  %s'%(freq_in_hertz ))##    
+    print('The maximum frequency is:  %s'%(freq_in_hertz ))##
     #freqs = trans_data_to_pd([freqs], label=['freqs'],dtype='list')##
     #20*scipy.log10(FFT)
     #FFT = trans_data_to_pd([  20*scipy.log10(FFT)  ], label=label,dtype='list')
-    #FFT = trans_data_to_pd([  (FFT)  ], label=label,dtype='list')##    
+    #FFT = trans_data_to_pd([  (FFT)  ], label=label,dtype='list')##
     return np.array(freqs), np.array( FFT   )
 
 
@@ -1048,7 +1048,7 @@ def plot_line_focus2(df_res,cuts,pix=0.79,title=None,
                            layout=[M,1])
     axs[0].set_title(title)
     for n in range(M):
-        df_res_.plot( x=td, y = [ keys[n] ],subplots=False, 
+        df_res_.plot( x=td, y = [ keys[n] ],subplots=False,
                 marker='o',c='b', ls = '--', ax=axs[n])
 
     #do analysis _center
@@ -1078,7 +1078,7 @@ def plot_line_focus2(df_res,cuts,pix=0.79,title=None,
 
     label=str(str(cuts[i])
         +' Center: '+str( round(max(polfit)-min(polfit),2) )+ 'um   rms: +/-'
-        +str(  round(std,2))+'um' )   
+        +str(  round(std,2))+'um' )
 
     axs2[0].plot( td, np.zeros( len(td) ) + std, c='red',ls='--',lw=4)
     axs2[0].plot( td, np.zeros( len(td) )- std,  c='red',ls='--',lw=4)
@@ -1158,7 +1158,7 @@ def plot_line_focus(res,cuts,pix=1,epochtime='false', times=None):
         if epochtime=='false':
            x=xrange(len(y))
            x_str='image #'
-        else: 
+        else:
           x=epoch
           x_str='epoch [s]'
         plt.plot(x,(y-np.mean(y))*pix,'+',label=str(cuts[i]))
@@ -1175,7 +1175,7 @@ def plot_line_focus(res,cuts,pix=1,epochtime='false', times=None):
         if epochtime=='false':
             x=xrange(len(y))
             x_str='image #'
-        else: 
+        else:
           #x=epoch
           x=xrange(len(y))
           x_str='epoch [s]'
@@ -1335,7 +1335,7 @@ def knife_edge(filename, direction='horz', cuts=[1,2,3], firstim=0, lastim=1,pix
             #imgplot= plt.imshow(image_data/(imcount-firstim+1),origin='lower')
             #imgplot.set_cmap('gray')
             time.sleep(5)
-            try: 
+            try:
                 im = Image.open(file_to_open);
                 #im.show()
             except:get_out=1
@@ -1427,7 +1427,7 @@ def detselect(detector_object, suffix="_stats1_total"):
     """Switch the active detector and set some internal state"""
     gs.DETS =[detector_object]
     gs.PLOT_Y = detector_object.name + suffix
-    gs.TABLE_COLS = [gs.PLOT_Y] 
+    gs.TABLE_COLS = [gs.PLOT_Y]
 
 def get_ID_calibration(gapstart, gapstop, xray_eye1=None, gapstep=.2, gapoff=0, sl=300):
     """
@@ -1438,7 +1438,7 @@ def get_ID_calibration(gapstart, gapstop, xray_eye1=None, gapstep=.2, gapoff=0, 
         gapstop: maximum gap used in calibration
         gapstep: size of steps between two gap points
         gapoff: offset applied to calculation gap vs. energy from xfuncs.get_Es()
-        sl: sleep between two gap points (to avoid overheating the DCM Bragg motor) 
+        sl: sleep between two gap points (to avoid overheating the DCM Bragg motor)
     writes outputfile with fitted value for the center of the Bragg scan to:  '/home/xf11id/Repos/chxtools/chxtools/X-ray_database/
         changes 03/18/2016: made compatible with python V3 and latest version of bluesky (working on it!!!)
     """
