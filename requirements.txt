@@ -9,6 +9,7 @@ numpy
 pandas
 pims
 pyepics
+pymongo
 scikit-beam
 scipy
 
