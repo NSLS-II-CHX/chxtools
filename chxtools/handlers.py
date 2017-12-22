@@ -16,4 +16,4 @@ if use_dask:
 
 db = Broker.named('chx')
 db.reg.register_handler('AD_EIGER2', EigerHandler)
-db.reg.register_handler('AD_EIGER2', EigerHandler)
+db.reg.register_handler('AD_EIGER', EigerHandler)
