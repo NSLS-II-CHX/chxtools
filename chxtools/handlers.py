@@ -5,8 +5,10 @@ from databroker.assets.handlers_base import HandlerBase
 from eiger_io.fs_handler_dask import EigerDaskHandler, EigerImagesDask
 from eiger_io.fs_handler import EigerHandler, EigerImages
 
+print('here')
+
 # toggle use of dask or no dask
-use_dask = True
+use_dask = False
 if use_dask:
     EigerHandler = EigerDaskHandler
     EigerImages = EigerImagesDask
