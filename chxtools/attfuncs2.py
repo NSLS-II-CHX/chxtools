@@ -11,6 +11,7 @@ physical setup of attenuator system -> att_setup
 calculate optimal transmission -> calc_T
 set optimal transmission -> set_T
 by LW 09/25/2017
+_v2 (this version): added W-edge as T=0 [02/07/2018]
 """
 import numpy as np
 from chxtools import xfuncs as xf
@@ -27,7 +28,8 @@ def att_setup():
     """
     att_pos=[2.75,4.75,6.75,8.75,10.75,12.75,14.75,16.75,18.75]
     Si_th=[200,400,600,800,1000,1200,1400,1600,1800]
-    return [att_pos,Si_th]
+    W_th=200 #thickness of W-edge
+    return [att_pos,Si_th,W_th]
 
 def calc_T(T,E='auto'):
     """
@@ -54,24 +56,34 @@ def calc_T(T,E='auto'):
     # attenuator setup
     att_conf=att_setup()
     Si_th=np.array(att_conf[1])
+    W_th=np.array(att_conf[2])
     att_pos=att_conf[0]
-    ava_T=xf.get_T('Si',E/1E3,Si_th)
-    ratio_T=ava_T/T
-    for i in range(len(ratio_T)):
-        if ratio_T[i] <1:
-            ratio_T[i]=1/ratio_T[i]
-    ind=np.argmin(abs(ratio_T-1))
-    bestT=ava_T[ind]
-    th_Si=Si_th[ind]
-    pos_att=att_pos[ind]
-    if T==1:
-        th_Si=0;pos_att=0;bestT=1
+    if T > 0:
+        ava_T=xf.get_T('Si',E/1E3,Si_th)
+        ratio_T=ava_T/T
+        for i in range(len(ratio_T)):
+            if ratio_T[i] <1:
+                ratio_T[i]=1/ratio_T[i]
+        ind=np.argmin(abs(ratio_T-1))
+        bestT=ava_T[ind]
+        th_Si=Si_th[ind]
+        pos_att=att_pos[ind]
+        if T==1:
+            th_Si=0;pos_att=0;bestT=1
+        elif T == 0:
+            th_Si=max(Si_th);pos_att=max(np.array(att_pos));bestT=xf.get_T('Si',E/1E3,th_Si)
+        print('calculations for Si absorbers in monitor chamber:')
+        print('requested transmission: '+str(T)+' at '+str(E/1E3)+'keV' )
+        print('best match: '+str(bestT)+' using '+str(th_Si)+'um of Si -> T_request/T_available= '+str(T/bestT))
+        return [pos_att,bestT]
     elif T == 0:
-        th_Si=max(Si_th);pos_att=max(np.array(att_pos));bestT=xf.get_T('Si',E/1E3,th_Si)
-    print('calculations for Si absorbers in monitor chamber:')
-    print('requested transmission: '+str(T)+' at '+str(E/1E3)+'keV' )
-    print('best match: '+str(bestT)+' using '+str(th_Si)+'um of Si -> T_request/T_available= '+str(T/bestT))
-    return [pos_att,bestT]
+        ava_T=xf.get_T('W',E/1E3,W_th)
+        pos_att=-3.3 # assume edge at -21.8
+        print('calculations for absorbers in monitor chamber:')
+        print('requested transmission: '+str(T)+' at '+str(E/1E3)+'keV' )
+        print('best match: '+str(ava_T)+' using '+str(W_th)+'um of W -> Tungsten edge')
+        return [pos_att,ava_T]
+        
 
 def get_T(E='auto'):
     """
@@ -94,11 +106,13 @@ def get_T(E='auto'):
         else:
             raise attfuncs_Exception("error: could not convert energy argument. Input argument E has to be 2000<E<30000 [eV] or 'auto'")
     tol=0.5 #tolerance for accepting absorber position
-    tol2=.8 #tolerance for acceptiong empty slot position
-    empty_pos=-18.5                               # this needs to become a PV!!!
+    tol2=.8 #tolerance for accepting empty slot position
+    empty_pos=-18.5                               # assume that center of open slot is always set to -18.5
+    W_pos=-21.8
     current_pos=caget('XF:11IDB-OP{Mon:Foil-Ax:X}Mtr.RBV')
     # attenuator setup
     att_conf=att_setup()
+    W_th=np.array(att_conf[2])
     Si_th=np.array(att_conf[1])
     att_pos=np.array(att_conf[0])
     if current_pos >=empty_pos+min(att_pos)-tol and current_pos <= empty_pos+max(att_pos)+tol:
@@ -106,11 +120,17 @@ def get_T(E='auto'):
         if abs(empty_pos-current_pos+att_pos[ind]) <= tol:
             currentT=xf.get_T('Si',E/1E3,Si_th[ind])
             print('current transmission at '+str(E/1E3)+'keV: '+str(currentT)+'  ('+str(Si_th[ind])+'um Si)')
+        else:
+            print('Neither empty slot nor any Si absorber is aligned with the beam...transmission unknown')
+            currentT=float('nan')
     elif abs(current_pos-empty_pos) <= tol2:
         currentT=1
         print('empty slot is in the beam, transmission T=1')
+    elif abs(current_pos-W_pos) <= tol:
+        currentT=xf.get_T('W',E/1E3,W_th)
+        print('Tungsten edge is in the beam, transmission T= '+str(currentT))
     else:
-        print('Neither emppty slot nor any Si absorber is aligned with the beam...transmission unknown')
+        print('Neither empty slot nor any Si absorber is aligned with the beam...transmission unknown')
         currentT=float('nan')
     return currentT
 
@@ -128,12 +148,11 @@ def set_T(T):
     """
     E=caget('XF:11IDA-OP{Mono:DCM-Ax:Energy}Mtr.RBV')     ### get energy automatically with channel access
     tol=0.5
-    empty_pos=-18.5                               # this needs to become a PV!!!
+    empty_pos=-18.5                               # assume that center of open slot is always set to -18.5
     [pos_att,bestT]=calc_T(T,E)
     target_pos=empty_pos+pos_att
     print('moving foil_x to target_pos')
-    caput('XF:11IDB-OP{Mon:Foil-Ax:X}Mtr.VAL',target_pos)
-    time.sleep(15)
+    caput('XF:11IDB-OP{Mon:Foil-Ax:X}Mtr.VAL',target_pos,wait=True)
     if abs(caget('XF:11IDB-OP{Mon:Foil-Ax:X}Mtr.RBV')-target_pos) <= tol:
         print('absorbers set successfully!')
     else: raise attfuncs_Exception("something went wrong...position for requested absorber not reached...")
@@ -142,7 +161,7 @@ def set_abs(abs_num=3):
     """
     call: set_abs(abs_num=3)
     function calls att_setup()
-    required arument: abs_num -> number of Si absorber
+    required argument: abs_num -> number of Si absorber
     0: empry slot, 1: 200um, 2: 400um, ...9: 1800um
     function moves Si absorbers in monitor chamber to requested aborber number
     function returns current transmission value
@@ -167,8 +186,7 @@ def set_abs(abs_num=3):
                 E=caget('XF:11IDA-OP{Mono:DCM-Ax:Energy}Mtr.RBV')     ### get energy automatically with channel access
                 curr_T=xf.get_T('Si',E/1E3,Si_th[abs_num-1])
                 curr_Sith=Si_th[abs_num-1]
-        caput('XF:11IDB-OP{Mon:Foil-Ax:X}Mtr.VAL',target_pos)
-        time.sleep(15)
+        caput('XF:11IDB-OP{Mon:Foil-Ax:X}Mtr.VAL',target_pos,wait=True)
         if abs(caget('XF:11IDB-OP{Mon:Foil-Ax:X}Mtr.VAL')-target_pos) <= tol:
             print('absorbers in monitor chamber set successfully!')
             print('transmission is '+str(curr_T)+'  with '+str(curr_Sith)+'um Si at '+str(E/1E3)+'keV')
