@@ -438,8 +438,10 @@ def get_pinflux(current,Energy,thickness=300):
     epsilon=3.66   # energy for creation of electron-hole pair in Si [eV]
     thickness=thickness/1.0E4  #conversion to cm
     # read datafile with scattering cross section:
-    loadn=datapath+'PhElAbsCross_Si.dat'
-    crossdat=pl.loadtxt(loadn,comments='%')
+    #loadn=datapath+'PhElAbsCross_Si.dat'
+    loadn = datapath / 'PhElAbsCross_Si.dat'
+    #crossdat = pl.loadtxt(loadn,comments='%')
+    crossdat = pl.loadtxt(str(loadn), comments='%')
     # check for energy range:
     xmin=min(crossdat[:,0])*1E3
     xmax=max(crossdat[:,0])*1E3
