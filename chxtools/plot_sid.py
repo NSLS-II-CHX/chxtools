@@ -1,5 +1,6 @@
 from databroker import Broker
 import matplotlib.pyplot as plt
+from .handlers import db
 
 
 def plot_scan(sid=-1, x=None, y=None):
@@ -14,7 +15,6 @@ def plot_scan(sid=-1, x=None, y=None):
             from chxtools.plot import plot_scan
             plot_scan([-1,-2], x='ivu_gap',y='xray_cam_stats_total1')
     '''
-    db = Broker.named('chx')
 
     if not isinstance(sid, list):
         sid = [sid]
