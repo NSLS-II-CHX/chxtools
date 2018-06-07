@@ -46,6 +46,8 @@ pv_trig = 'XF:11IDB-BI{XBPM:02}FaSoftTrig-SP'
 data_path = '/XF11ID/analysis/Commissioning/BPM_Stability/Data/'
 res_path = '/XF11ID/analysis/Commissioning/BPM_Stability/Result/'
 
+
+
 #filename
 
 
