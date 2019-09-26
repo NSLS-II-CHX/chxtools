@@ -368,6 +368,9 @@ def get_gap(E,harmonic=3,ID=default_id):
     and harmonic based on magnetic measurement data in the database
     type get_gap(E [kev], harmonic [integer] (default=3), id (default: defined by 'default_id'));
     E can be an array of energies. Type get_gap\"ID?\") for a list of available magnetic datasets.
+    
+    Change gap unit from mm to um by Yugang at 2019/April
+    
     """
     #get list_of available magnetic measurements from data file directory:
     name=[]
@@ -388,7 +391,7 @@ def get_gap(E,harmonic=3,ID=default_id):
             #harmonic=harmonic*1.0
             if np.min(E/harmonic)>=np.min(magdat[:,2]) and np.max(E/harmonic)<=np.max(magdat[:,2]):
                 gap=np.interp(E/harmonic,magdat[:,2],magdat[:,0])
-                return gap
+                return gap * 1000.0
             # this else should be a warning only and should return NaN
             else: raise xfuncs_Exception ('error: energy '+"%3.4f" %E +'[keV] out of range for requested harmonic number, gap limit: ('+"%3.4f" % np.min(magdat[:,0])+'=<gap<='+"%3.4f" % np.max(magdat[:,0])+'mm), try using higher/lower harmonic number.')
         else: raise xfuncs_Exception('error: non recognized magnetic data. Type get_gap(\'ID?\') for a list of available mangetic datasets.')
@@ -399,11 +402,16 @@ def get_Es(gap,harmonic=[1,2,3,4,5],ID=default_id):
     by LW 12/03/2014,
     function calculates the X-ray energies for a given undulator gap and set of harmonics
     based on magnetic measurement data in the database
-    type get_Es(gap [mm], harmonic [integer] (default=[1,2,3,4,5]), id (default: defined by 'default_id'));
+    type get_Es(gap [um], harmonic [integer] (default=[1,2,3,4,5]), id (default: defined by 'default_id'));
     harmonic can be a list of integers. Type get_Es(\"ID?\") for a list of available magnetic datasets
+    
+    Change gap unit from mm to um by Yugang at 2019/April
+    The gap unit should be um
+    
     """
     #get list_of available magnetic measurements from data file directory:
     name=[]
+    gap = gap/1000.0
     for i in range(len(xdatafiles)):
         m=re.search('(?<=id_)\w+', xdatafiles[i])
         if m is not None:

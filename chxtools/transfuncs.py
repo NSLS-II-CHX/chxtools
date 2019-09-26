@@ -10,6 +10,17 @@ import numpy as np
 from chxtools import xfuncs as xf
 from scipy.optimize import fminbound
 from epics import *
+
+def CRL_focalpoint(energy,lens_configuration):
+    """
+    CRL_focalpoint(energy,lens_configuration):
+    lens_confguration is a dictionary of the form
+    [lens_radius1:numer lenses, lens_radius2: number_lenses, ...]
+    returns the focal length
+    """
+    focal_distance=0.0
+    return focal_distance
+
 def trans_setup():
     """
     defining physical configuration of CHX transfocator system
