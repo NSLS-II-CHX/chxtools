@@ -8,6 +8,7 @@ version = "2026.3.0"
 numpy = "*"
 pyepics = "*"
 python = ">=3.12,<3.13"
+nslsii = "==0.11.8"
 databroker = "==2.0.0b68"
 eiger-io = "*"
 matplotlib = "*"
@@ -15,6 +16,9 @@ pymongo = "*"
 scikit-beam = "*"
 scikit-image = "*"
 scipy = "*"
+ophyd = "*"
+ophyd-async = "*"
+
 
 [feature.terminal.dependencies]
 ipython = ">=9.5.0"
