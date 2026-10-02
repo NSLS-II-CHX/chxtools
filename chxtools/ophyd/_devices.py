@@ -3,6 +3,7 @@ from typing import ClassVar, TypedDict
 
 from area_detectors.eiger import EigerFastTrigger
 from area_detectors.timepix import TimePixDetector
+from beam_monitors import Elm, XBPM, XBpm, XBpmFeedbackEnable
 from ophyd import Device
 
 
@@ -17,6 +18,9 @@ class Devices(Enum):
     timepix: ClassVar[DeviceDescriptor] = {
         'object': TimePixDetector,
     }
-    EigerFastTrigger: ClassVar[DeviceDescriptor] = {
+    eigerfasttrigger: ClassVar[DeviceDescriptor] = {
         'object': EigerFastTrigger,
+    }
+    elm: ClassVar[DeviceDescriptor] = {
+        'object': Elm
     }

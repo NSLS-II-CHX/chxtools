@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -102,10 +101,10 @@ class Tpx3Files(Device):
         self._n += 1
         self.raw_filepaths.set(filenames).wait()
 
-    def unstage(self) -> List[object]:
+    def unstage(self) -> list[object]:
         # TODO reset these to their original values rather than junk
         self.raw_filepath.set('file:/media/nvme/raw/').wait()
-        self.raw_file_template.set(f"garbage").wait()
+        self.raw_file_template.set("garbage").wait()
         self.raw_write_enable.set(0).wait()
         # because we need to flush setting to actual server from IOC
         self.set_settings.set(1).wait()

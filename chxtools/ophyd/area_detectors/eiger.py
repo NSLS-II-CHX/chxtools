@@ -26,7 +26,6 @@ from ophyd.areadetector.filestore_mixins import (
 )
 from ophyd.device import Staged
 from ophyd.status import StatusBase
-from ophyd.utils import set_and_wait
 
 from chxtools.ophyd.area_detectors.utils import name_dir_mapping
 
@@ -141,13 +140,14 @@ class EigerBase(AreaDetector):
         return {'fields': [self.stats1.total.name]}
 
 
-class EigerDetectorCamV33(AreaDetectorCam):
+class EigerDetectorCam(AreaDetectorCam):
     '''This is used to update the Eiger detector to AD33.
     '''
     firmware_version = Cpt(EpicsSignalRO, 'FirmwareVersion_RBV', kind='config')
 
     wait_for_plugins = Cpt(EpicsSignal, 'WaitForPlugins',
                            string=True, kind='config')
+    bit_depth = Cpt(EpicsSignalRO, 'BitDepthImage_RBV', kind='config')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -162,84 +162,14 @@ class EigerDetectorCamV33(AreaDetectorCam):
             if hasattr(cpt, 'ensure_nonblocking'):
                 cpt.ensure_nonblocking()
 
-class NewEigerDetectorCamV33(EigerDetectorCamV33):
-    bit_depth = Cpt(EpicsSignalRO, 'BitDepthImage_RBV', kind='config')
 
-class EigerBaseV33(EigerBase):
-    cam = Cpt(EigerDetectorCamV33, 'cam1:')
+class EigerSingleTrigger(SingleTrigger, EigerBase):
+    cam = Cpt(EigerDetectorCam, 'cam1:')
     stats1 = Cpt(StatsPluginV33, 'Stats1:')
     stats2 = Cpt(StatsPluginV33, 'Stats2:')
     stats3 = Cpt(StatsPluginV33, 'Stats3:')
     stats4 = Cpt(StatsPluginV33, 'Stats4:')
     stats5 = Cpt(StatsPluginV33, 'Stats5:')
-
-
-class EigerSingleTrigger(SingleTrigger, EigerBase):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.stage_sigs['cam.trigger_mode'] = 0
-        self.stage_sigs['shutter_mode'] = 1  # 'EPICS PV'
-        self.stage_sigs.update({'num_triggers': 1})
-
-    def stage(self, *args, **kwargs):
-        return super().stage(*args, **kwargs)
-
-    def trigger(self, *args, **kwargs):
-        status = super().trigger(*args, **kwargs)
-        set_and_wait(self.special_trigger_button, 1)
-        return status
-
-    def read(self, *args, streaming=False, **kwargs):
-        '''
-            This is a test of using streaming read.
-            Ideally, this should be handled by a new _stream_attrs property.
-            For now, we just check for a streaming key in read and
-            call super() if False, or read the one key we know we should read
-            if True.
-
-            Parameters
-            ----------
-            streaming : bool, optional
-                whether to read streaming attrs or not
-        '''
-        #ret = super().read()
-        #print("super read() : {}".format(ret))
-        #return ret
-        if streaming:
-            key = self._image_name  # this comes from the SingleTrigger mixin
-            read_dict = super().read()
-            ret = OrderedDict({key: read_dict[key]})
-            return ret
-        else:
-            ret = super().read(*args, **kwargs)
-            return ret
-
-    def describe(self, *args, streaming=False, **kwargs):
-        '''
-            This is a test of using streaming read.
-            Ideally, this should be handled by a new _stream_attrs property.
-            For now, we just check for a streaming key in read and
-            call super() if False, or read the one key we know we should read
-            if True.
-
-            Parameters
-            ----------
-            streaming : bool, optional
-                whether to read streaming attrs or not
-        '''
-        if streaming:
-            key = self._image_name  # this comes from the SingleTrigger mixin
-            read_dict = super().describe()
-            ret = OrderedDict({key: read_dict[key]})
-            return ret
-        else:
-            ret = super().describe(*args, **kwargs)
-            return ret
-
-
-
-class EigerSingleTrigger_AD37(SingleTrigger, EigerBaseV33):
-    cam = Cpt(NewEigerDetectorCamV33, 'cam1:')
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.auto_trigger = True
@@ -318,7 +248,7 @@ class FastShutterTrigger(Device):
     acquire = Cpt(EpicsSignal, 'Acquire-Cmd', trigger_value=1)
 
 
-class EigerFastTrigger(EigerBaseV33):
+class EigerFastTrigger(EigerBase):
     tr = Cpt(FastShutterTrigger, '')
 
     def __init__(self, *args, **kwargs):

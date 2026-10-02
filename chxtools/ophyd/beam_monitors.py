@@ -29,6 +29,8 @@ class XBpm(Device):
     c = Cpt(EpicsSignalRO, 'Ampl:CCurrAvg-I')
     d = Cpt(EpicsSignalRO, 'Ampl:DCurrAvg-I')
 
+class XBPM( Device):
+   vt = Cpt( EpicsSignal, 'CtrlDAC:BLevel-SP' )
 
 class Elm(Device):
 	sum_x = Cpt(EpicsSignalRO, 'SumX:MeanValue_RBV')
