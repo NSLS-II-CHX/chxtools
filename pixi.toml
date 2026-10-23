@@ -4,6 +4,12 @@ name = "chxtools"
 platforms = ["linux-64", "osx-64", "osx-arm64"]
 version = "2026.3.0"
 
+[package]
+channels = ["conda-forge"]
+name = "chxtools"
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+version = "2026.3.0"
+
 [feature.base.dependencies]
 numpy = "*"
 pyepics = "*"
