@@ -1,3 +1,5 @@
+import numpy as np
+
 # Define a mapping between the name of a detector and a folder to which to write the data
 # Needed for back-compatibility with old scripts using detector names different from the folder names
 name_dir_mapping = {
@@ -16,3 +18,11 @@ name_dir_mapping = {
         'eiger4m_single': 'eiger4m-1',
         'pilatus800': 'pilatus800k-1',
     }
+
+
+def str_to_wav(string:str):
+    return np.frombuffer(f"{string}\x00".encode('utf-8'),dtype="uint8")
+
+
+def _asset_undefined_error():
+    raise ValueError("File provider not specified, please initialize device with a path provider")

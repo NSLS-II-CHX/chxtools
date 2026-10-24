@@ -4,19 +4,14 @@ name = "chxtools"
 platforms = ["linux-64", "osx-64", "osx-arm64"]
 version = "2026.3.0"
 
-[package]
-channels = ["conda-forge"]
-name = "chxtools"
-platforms = ["linux-64", "osx-64", "osx-arm64"]
-version = "2026.3.0"
-
-[feature.base.dependencies]
+[dependencies]
 numpy = "*"
+bluesky = "*"
 pyepics = "*"
 python = ">=3.12,<3.13"
-nslsii = "==0.11.8"
-databroker = "==2.0.0b68"
-eiger-io = "*"
+nslsii = "*"#"==0.11.8"
+#databroker = "==2.0.0b68"
+#eiger-io = "*"
 matplotlib = "*"
 pymongo = "*"
 scikit-beam = "*"
@@ -50,5 +45,5 @@ black-format = "black ."
 isort-fix = "isort ."
 
 [environments]
-terminal = {features=["base", "terminal"], solve-group="profile"}
+terminal = {features=["terminal"], solve-group="profile"}
 dev = {features=["dev"], no-default-feature = true}

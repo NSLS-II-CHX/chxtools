@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Callable
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -15,6 +16,8 @@ from ophyd.areadetector.plugins import (
     TimeSeriesPlugin_V34,
 )
 from ophyd.signal import EpicsSignal, Signal
+
+from .utils import _asset_undefined_error, str_to_wav
 
 
 class PreciseDtypeSignal(Signal):
@@ -34,10 +37,13 @@ class Tpx3Files(Device):
         kind="config",
         path_semantics="posix",
     )
+    raw_filepath2 = Cpt(EpicsSignal,"Raw1FilePath")
+
     raw_file_template = Cpt(
         EpicsSignalWithRBV, "RawFileTemplate", string=True, kind="config"
     )
     raw_write_enable = Cpt(EpicsSignalWithRBV, "WriteRaw", string=True, kind="omitted", put_complete=True)
+    raw_write_enable2 = Cpt(EpicsSignalWithRBV, "WriteRaw1", string=True, kind="omitted", put_complete=True)
 
     img_filepath = Cpt(EpicsSignalWithRBV, "ImgFilePath", kind="config")
     img_file_template = Cpt(EpicsSignalWithRBV, "ImgFileTemplate", kind="config")
@@ -56,7 +62,9 @@ class Tpx3Files(Device):
         # This is changed for when a datum is a slice
         # also used by ophyd
         self.filestore_spec = "TPX3_RAW"
+        self.streaming = False
         self.frame_num = None
+        self.assets_path = _asset_undefined_error
         super().__init__(*args, **kwargs)
         self._datum_kwargs_map = {}  # store kwargs for each uid
         self._n = 0
@@ -76,6 +84,9 @@ class Tpx3Files(Device):
 
         # because we need to flush setting to actual server from IOC
         self.raw_write_enable.set(1).wait()
+        if self.streaming:
+            self.raw_filepath2.set(str_to_wav("tcp:/localhost:8088")).wait()
+            self.raw_write_enable2.set(1).wait()
         self.set_settings.set(1).wait()
         self.set_settings.set(1).wait()
 
@@ -106,6 +117,8 @@ class Tpx3Files(Device):
         self.raw_filepath.set('file:/media/nvme/raw/').wait()
         self.raw_file_template.set("garbage").wait()
         self.raw_write_enable.set(0).wait()
+        if self.streaming:
+            self.raw_write_enable2.set(0).wait()
         # because we need to flush setting to actual server from IOC
         self.set_settings.set(1).wait()
         return super().unstage()
@@ -117,6 +130,10 @@ class Tpx3HDF(Device):
     hdf5_file_path = Cpt(EpicsSignalWithRBV, "FilePath", kind="omitted")
     hdf5_create_directory = Cpt(EpicsSignalWithRBV, "CreateDirectory", kind="omitted")
     
+    def __init__(self, *args, **kwargs):
+        self.assets_path = _asset_undefined_error
+        super().__init__(*args, **kwargs)
+
     def stage(self):
          self.hdf5_create_directory.set(-4)
          write_path_template = self.assets_path() + f"{self.parent.assets_name}/%Y/%m/%d/"
@@ -147,15 +164,30 @@ class TimePixDetector(SingleTriggerV33, AreaDetector):
     ts3 = Cpt(TimeSeriesPlugin_V34, "Stats3:TS:")
     ts4 = Cpt(TimeSeriesPlugin_V34, "Stats4:TS:")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args,path_provider:Callable[[],str], **kwargs):
         self.assets_name = kwargs.pop("assets_name", "timepix")
+        self.assets_path = path_provider
+        streaming = kwargs.pop("streaming",False)
+
         super().__init__(*args, **kwargs)
+
+        self.files.streaming = streaming
+        self.files.assets_path = path_provider
+        self.hdf_plugin.assets_path = path_provider
 
         for j in range(1, 5):
             stat = getattr(self, f'stats{j}')
             stat.kind = 'normal'
             stat.total.kind = 'hinted'
             stat.ts_total.kind = 'normal'
+
+    @property
+    def streaming(self):
+        return self.files.streaming
+
+    @streaming.setter
+    def stream_set(self,active:bool):
+        self.files.streaming = active
 
     def trigger(self):
         self.files.update_file_template()

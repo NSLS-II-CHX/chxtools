@@ -1,7 +1,6 @@
 #atom
 #cython
 databroker
-eiger-io
 #enaml
 #fabio
 #h5py

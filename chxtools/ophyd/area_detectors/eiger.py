@@ -3,6 +3,7 @@ from collections import OrderedDict
 from datetime import datetime
 from pathlib import PurePath
 from types import SimpleNamespace
+from typing import Callable
 
 from nslsii.ad33 import StatsPluginV33
 from ophyd import (
@@ -120,6 +121,10 @@ class EigerBase(AreaDetector):
 
     # hotfix: shadow non-existant PV
     size_link = None
+
+    def __init__(self, *args,path_provider: Callable[[],str], **kwargs):
+        self.assets_path = path_provider
+        super().__init__(*args, **kwargs)
 
     def stage(self, *args, **kwargs):
         # before parent

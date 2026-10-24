@@ -1,5 +1,4 @@
-databroker
-eiger-io
+#databroker
 matplotlib
 numpy
 pyepics

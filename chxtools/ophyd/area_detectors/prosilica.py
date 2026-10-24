@@ -1,4 +1,6 @@
 
+from typing import Callable
+
 from nslsii.ad33 import SingleTriggerV33, StatsPluginV33
 from ophyd import Component as Cpt
 from ophyd import (
@@ -62,6 +64,10 @@ class StandardProsilica(SingleTrigger, ProsilicaDetector):
     # only so that it can ensure that the plugin is not auto-saving.
     tiff = Cpt(TIFFPluginEnsuredOff, suffix='TIFF1:')
 
+    def __init__(self, *args,path_provider: Callable[[],str], **kwargs):
+        self.assets_path = path_provider
+        super().__init__(*args, **kwargs)
+
     @property
     def hints(self):
         return {'fields': [self.stats1.total.name]}
@@ -85,6 +91,10 @@ class StandardProsilicaV33(SingleTriggerV33, ProsilicaDetector):
     # This class does not save TIFFs. We make it aware of the TIFF plugin
     # only so that it can ensure that the plugin is not auto-saving.
     tiff = Cpt(TIFFPluginEnsuredOff, suffix='TIFF1:')
+
+    def __init__(self, *args,path_provider: Callable[[],str], **kwargs):
+        self.assets_path = path_provider
+        super().__init__(*args, **kwargs)
 
     @property
     def hints(self):
@@ -153,6 +163,10 @@ class StandardPointGreyV33(SingleTriggerV33, PointGreyDetector):
     # This class does not save TIFFs. We make it aware of the TIFF plugin
     # only so that it can ensure that the plugin is not auto-saving.
     tiff = Cpt(TIFFPluginEnsuredOff, suffix='TIFF1:')
+
+    def __init__(self, *args,path_provider: Callable[[],str], **kwargs):
+        self.assets_path = path_provider
+        super().__init__(*args, **kwargs)
 
     @property
     def hints(self):
